@@ -1,0 +1,8 @@
+# VS
+.vscode
+.settings
+.project
+.classpath
+
+# Maven
+target/

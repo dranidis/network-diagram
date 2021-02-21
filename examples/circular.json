@@ -1,0 +1,23 @@
+[
+    {
+        "id": "A",
+        "duration": 1,
+        "pred": [
+            "C"
+        ]
+    },
+    {
+        "id": "B",
+        "duration": 2,
+        "pred": [
+            "A"
+        ]
+    },
+    {
+        "id": "C",
+        "duration": 2,
+        "pred": [
+            "B"
+        ]
+    }
+]
