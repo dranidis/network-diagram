@@ -194,17 +194,7 @@ public class NetworkDiagram {
         while (!workingTasks.isEmpty()) {
             List<Task> toRemove = new ArrayList<>();
             for (Task task : workingTasks) {
-
-                boolean canBeEvaluated = true;
-                for (String predId : task.pred) {
-                    Task predTask = tasks.get(predId);
-                    if (workingTasks.contains(predTask)) {
-                        canBeEvaluated = false;
-                        break;
-                    }
-                }
-
-                if (canBeEvaluated) {
+                if (taskPredecessorsAreNotInList(task, workingTasks)) {
                     addTaskToPaths(task, paths);
                     toRemove.add(task);
                 }
@@ -215,12 +205,24 @@ public class NetworkDiagram {
         return paths;
     }
 
+    private boolean taskPredecessorsAreNotInList(Task task, List<Task> taskList) {
+        boolean notInList = true;
+        for (String predId : task.pred) {
+            Task predTask = tasks.get(predId);
+            if (taskList.contains(predTask)) {
+                notInList = false;
+                break;
+            }
+        }
+        return notInList;
+    }
+
     private void addTaskToPaths(Task task, List<List<Task>> paths) {
         boolean added = false;
         for (List<Task> path : new ArrayList<>(paths)) {
-            Task predTask = getTaskPredIsInPath(task, path);
-            if (predTask != null) {
-                appendTaskToPaths(task, predTask, path, paths);
+            List<Task> predTasks = getTaskPredIsInPath(task, path);
+            if (!predTasks.isEmpty()) {
+                appendTaskToPaths(task, predTasks, path, paths);
                 added = true;
             }
         }
@@ -232,9 +234,8 @@ public class NetworkDiagram {
 
     }
 
-
-    private void appendTaskToPaths(Task task, Task predTask, List<Task> path, List<List<Task>> paths) {
-        if (path.get(path.size()-1) ==  predTask) {
+    private void appendTaskToPaths(Task task, List<Task> predTasks, List<Task> path, List<List<Task>> paths) {
+        if (predTasks.contains(path.get(path.size()-1))) {
             path.add(task);
         } else {
             List<Task> clonedPath = new ArrayList<>(path);
@@ -244,13 +245,14 @@ public class NetworkDiagram {
         }
     }
 
-    private Task getTaskPredIsInPath(Task task, List<Task> path) {
+    private List<Task> getTaskPredIsInPath(Task task, List<Task> path) {
+        List<Task> predTasks = new ArrayList<>();
         for (String predId : task.pred) {
             Task predTask = tasks.get(predId);
             if (path.contains(predTask)) 
-                return predTask;
+                predTasks.add(predTask);
         }
-        return null;
+        return predTasks;
     }
 
 }

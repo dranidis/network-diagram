@@ -247,6 +247,39 @@ public class NetworkDiagramTest
     }
 
     @Test
+    public void process_Should_WorkWithTransitiveDependencies() {
+        Task task1 = new Task();
+        task1.id = "A"; 
+        task1.pred = Arrays.asList(new String[]{});
+        task1.duration = 2;
+
+        Task task2 = new Task();
+        task2.id = "B"; 
+        task2.pred = Arrays.asList(new String[]{"A"});
+        task2.duration = 3;
+
+        Task task3 = new Task();
+        task3.id = "C"; 
+        task3.pred = Arrays.asList(new String[]{"B", "A"});
+        task3.duration = 4;
+
+        NetworkDiagram nd = new NetworkDiagram();
+        nd.getTasks().put(task1.id, task1);
+        nd.getTasks().put(task2.id, task2);
+        nd.getTasks().put(task3.id, task3);
+
+        nd.process();
+
+        assertEquals(0, task1.earliestStart.getAsLong());
+        assertEquals(2, task2.earliestStart.getAsLong());
+        assertEquals(5, task3.earliestStart.getAsLong());
+
+        assertEquals(2, task1.latestFinish.getAsLong());
+        assertEquals(5, task2.latestFinish.getAsLong());
+        assertEquals(9, task3.latestFinish.getAsLong());
+    }
+
+    @Test
     public void criticalPath_Should_Be_Task_When_OnlyOne() {
         Task task1 = new Task();
         task1.id = "A"; 
@@ -330,6 +363,88 @@ public class NetworkDiagramTest
         assertEquals("C", paths.get(1).get(1).id);         
     }
 
+    @Test
+    public void criticalPath_Should_WorkWithTransitiveDependencies() {
+        Task task1 = new Task();
+        task1.id = "A"; 
+        task1.pred = Arrays.asList(new String[]{});
+        task1.slack = OptionalLong.of(0);
 
+        Task task2 = new Task();
+        task2.id = "B"; 
+        task2.pred = Arrays.asList(new String[]{"A"});
+        task2.slack = OptionalLong.of(0);
+
+
+        Task task3 = new Task();
+        task3.id = "C"; 
+        task3.pred = Arrays.asList(new String[]{"A", "B"});
+        task3.slack = OptionalLong.of(0);
+
+        NetworkDiagram nd = new NetworkDiagram();
+        nd.getTasks().put(task1.id, task1);
+        nd.getTasks().put(task2.id, task2);
+        nd.getTasks().put(task3.id, task3);
+
+        List<List<Task>> paths = nd.getCriticalPaths();
+        
+        assertEquals(1, paths.size());       
+        assertEquals(3, paths.get(0).size());       
+
+        assertEquals("A", paths.get(0).get(0).id);       
+        assertEquals("B", paths.get(0).get(1).id);   
+        assertEquals("C", paths.get(0).get(2).id);         
+    }
     
+    @Test
+    public void criticalPath_Should_WorkWithTransitiveDependenciesMoreThanOnePath() {
+        Task task1 = new Task();
+        task1.id = "A"; 
+        task1.pred = Arrays.asList(new String[]{});
+        task1.slack = OptionalLong.of(0);
+
+        Task task2 = new Task();
+        task2.id = "B"; 
+        task2.pred = Arrays.asList(new String[]{});
+        task2.slack = OptionalLong.of(0);
+
+        Task task3 = new Task();
+        task3.id = "C"; 
+        task3.pred = Arrays.asList(new String[]{"A", "B"});
+        task3.slack = OptionalLong.of(0);
+
+        Task task4 = new Task();
+        task4.id = "D"; 
+        task4.pred = Arrays.asList(new String[]{"A", "B"});
+        task4.slack = OptionalLong.of(0);
+
+        Task task5 = new Task();
+        task5.id = "E"; 
+        task5.pred = Arrays.asList(new String[]{"A", "B", "C", "D"});
+        task5.slack = OptionalLong.of(0);
+
+        Task task6 = new Task();
+        task6.id = "F"; 
+        task6.pred = Arrays.asList(new String[]{"A", "B", "C", "D"});
+        task6.slack = OptionalLong.of(0);
+
+        NetworkDiagram nd = new NetworkDiagram();
+        nd.getTasks().put(task1.id, task1);
+        nd.getTasks().put(task2.id, task2);
+        nd.getTasks().put(task3.id, task3);
+        nd.getTasks().put(task4.id, task4);
+        nd.getTasks().put(task5.id, task5);
+        nd.getTasks().put(task6.id, task6);
+
+        List<List<Task>> paths = nd.getCriticalPaths();
+
+        assertEquals(8, paths.size());
+        for(int i = 0; i < 8; i++) {      
+            assertEquals(3, paths.get(i).size());  
+            assertTrue(Arrays.asList(new String[]{"A", "B"}).contains(paths.get(i).get(0).id));
+            assertTrue(Arrays.asList(new String[]{"C", "D"}).contains(paths.get(i).get(1).id));
+            assertTrue(Arrays.asList(new String[]{"E", "F"}).contains(paths.get(i).get(2).id));
+        }     
+    
+    }    
 }
