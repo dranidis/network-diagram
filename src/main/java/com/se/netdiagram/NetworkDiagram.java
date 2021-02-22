@@ -49,22 +49,22 @@ public class NetworkDiagram {
         successors();
 
         List<Task> checked = new ArrayList<>();
-        for (Task task: tasks.values()) {
+        for (Task task : tasks.values()) {
             if (!checked.contains(task)) {
                 List<Task> visited = new ArrayList<>();
                 checkCircular(task, visited, checked);
-           }
-        }   
+            }
+        }
     }
 
     private void checkCircular(Task task, List<Task> visited, List<Task> checked) throws CircularDependencyException {
-        for (Task succTask: task.succ) {
+        for (Task succTask : task.succ) {
             if (visited.contains(succTask)) {
                 String path = "";
-                for (Task t: visited) {
+                for (Task t : visited) {
                     path += t.id + " -> ";
                 }
-                path += task.id + " -> " +  succTask.id;
+                path += task.id + " -> " + succTask.id;
                 throw new CircularDependencyException("Circular dependency: " + path);
             }
             visited.add(task);
