@@ -16,27 +16,50 @@ public class NetworkDiagram {
     private Map<String, Task> tasks = new HashMap<>();
 
     /**
-     * refactor to create a list of pred/succ tasks instead of strings
      * 
      * @param taskList
      * @throws DuplicateTaskKeyException
      * @throws KeyNotFoundException
      */
-    public void readTasklist(List<Task> taskList) throws DuplicateTaskKeyException, KeyNotFoundException {
+    public void readTasklist(List<TaskJSON> taskList)
+            throws DuplicateTaskKeyException, KeyNotFoundException {
         tasks = new HashMap<>();
 
-        for (Task task : taskList) {
-            if (tasks.containsKey(task.id)) {
-                throw new DuplicateTaskKeyException("Id: " + task.id + " already exists!");
+        for (TaskJSON taskJSON : taskList) {
+            if (tasks.containsKey(taskJSON.id)) {
+                throw new DuplicateTaskKeyException("Id: " + taskJSON.id + " already exists!");
             }
+            Task task = new Task();
+            task.id = taskJSON.id;
+            task.duration = taskJSON.duration;
             tasks.put(task.id, task);
         }
 
-        for (Task task : taskList) {
-            for (String predId : task.pred) {
-                if (!tasks.containsKey(predId)) {
+        for (TaskJSON taskJSON : taskList) {
+            Task task = tasks.get(taskJSON.id);
+            for (String predId : taskJSON.pred) {
+                Task predTask = tasks.get(predId);
+                if (predTask == null) {
                     throw new KeyNotFoundException("Not existing pred KEY: " + predId);
                 }
+                task.pred.add(predTask);
+            }
+        }
+    }
+
+    public void process() {
+        successors();
+        long projectEnd = forward();
+        backward(projectEnd);
+    }
+
+    /**
+     * Create succ links
+     */
+    private void successors() {
+        for (Task task : tasks.values()) {
+            for (Task predTask : task.pred) {
+                predTask.succ.add(task);
             }
         }
     }
@@ -46,27 +69,15 @@ public class NetworkDiagram {
      * 
      * @return project end
      */
-    public long forward() {
+    private long forward() {
         OptionalLong projectEnd = OptionalLong.of(0);
-
         List<Task> workingTasks = new ArrayList<>(tasks.values());
 
         while (!workingTasks.isEmpty()) {
             List<Task> toRemove = new ArrayList<>();
             for (Task task : workingTasks) {
-                boolean canBeEvaluated = true;
-                task.earliestStart = OptionalLong.of(0);
-                for (String predId : task.pred) {
-                    Task predTask = tasks.get(predId);
-                    if (workingTasks.contains(predTask)) {
-                        canBeEvaluated = false;
-                        break;
-                    }
-                    task.earliestStart = max(task.earliestStart, predTask.earliestFinish);
-                }
-
-                if (canBeEvaluated) {
-                    task.earliestFinish = OptionalLong.of(task.earliestStart.getAsLong() + task.duration);
+                if (!existsAtLeastOneInList(task.pred, workingTasks)) {
+                    calculateEarliestValues(task);
                     projectEnd = max(projectEnd, task.earliestFinish);
                     toRemove.add(task);
                 }
@@ -74,34 +85,38 @@ public class NetworkDiagram {
             workingTasks.removeAll(toRemove);
         }
         return projectEnd.getAsLong();
-
     }
 
-    public void backward(long projectEnd) {
+    private void backward(long projectEnd) {
         List<Task> workingTasks = new ArrayList<>(tasks.values());
 
         while (!workingTasks.isEmpty()) {
             List<Task> toRemove = new ArrayList<>();
             for (Task task : workingTasks) {
-                boolean canBeEvaluated = true;
-                task.latestFinish = OptionalLong.of(projectEnd);
-                for (String succId : task.succ) {
-                    Task succTask = tasks.get(succId);
-                    if (workingTasks.contains(succTask)) {
-                        canBeEvaluated = false;
-                        break;
-                    }
-                    task.latestFinish = min(task.latestFinish, succTask.latestStart);
-                }
-
-                if (canBeEvaluated) {
-                    task.latestStart = OptionalLong.of(task.latestFinish.getAsLong() - task.duration);
-                    task.slack = OptionalLong.of(task.latestFinish.getAsLong() - task.earliestFinish.getAsLong());
+                if (!existsAtLeastOneInList(task.succ, workingTasks)) {
+                    calculateLatestValuesAndSlack(task, projectEnd);
                     toRemove.add(task);
                 }
             }
             workingTasks.removeAll(toRemove);
         }
+    }
+
+    private void calculateEarliestValues(Task task) {
+        task.earliestStart = OptionalLong.of(0);
+        for (Task predTask : task.pred) {
+            task.earliestStart = max(task.earliestStart, predTask.earliestFinish);
+        }
+        task.earliestFinish = OptionalLong.of(task.earliestStart.getAsLong() + task.duration);
+    }
+
+    private void calculateLatestValuesAndSlack(Task task, long projectEnd) {
+        task.latestFinish = OptionalLong.of(projectEnd);
+        for (Task succTask : task.succ) {
+            task.latestFinish = min(task.latestFinish, succTask.latestStart);
+        }
+        task.latestStart = OptionalLong.of(task.latestFinish.getAsLong() - task.duration);
+        task.slack = OptionalLong.of(task.latestFinish.getAsLong() - task.earliestFinish.getAsLong());
     }
 
     private OptionalLong max(OptionalLong oldMax, OptionalLong newValue) {
@@ -116,19 +131,6 @@ public class NetworkDiagram {
             return newValue;
         }
         return oldMin;
-    }
-
-    public Map<String, Task> getTasks() {
-        return tasks;
-    }
-
-    public void successors() {
-        for (Task task : tasks.values()) {
-            for (String pred : task.pred) {
-                Task predTask = tasks.get(pred);
-                predTask.succ.add(task.id);
-            }
-        }
     }
 
     public void print() {
@@ -153,35 +155,27 @@ public class NetworkDiagram {
 
     }
 
-    public void process() {
-        successors();
-        long projectEnd = forward();
-        backward(projectEnd);
-    }
-
-	public void readJsonFile(String fileName) {
+    public void readJsonFile(String fileName) {
         ObjectMapper mapper = new ObjectMapper();
         mapper.registerModule(new Jdk8Module());
-        List<Task> taskList = null;
-
+        List<TaskJSON> taskJSONList;
         try {
-            taskList = mapper.readValue(new File(fileName), new TypeReference<List<Task>>(){});
+            taskJSONList = mapper.readValue(new File(fileName), new TypeReference<List<TaskJSON>>() {
+            });
         } catch (IOException e) {
             e.printStackTrace();
             return;
-        } 
-        
-        try {
-            readTasklist(taskList);
         }
-        catch (DuplicateTaskKeyException e) {
+        try {
+            readTasklist(taskJSONList);
+        } catch (DuplicateTaskKeyException e) {
             e.printStackTrace();
         } catch (KeyNotFoundException e) {
             e.printStackTrace();
-        }	
+        }
     }
 
-	public List<List<Task>> getCriticalPaths() {
+    public List<List<Task>> getCriticalPaths() {
         List<List<Task>> paths = new ArrayList<>();
 
         List<Task> workingTasks = new ArrayList<>();
@@ -194,7 +188,7 @@ public class NetworkDiagram {
         while (!workingTasks.isEmpty()) {
             List<Task> toRemove = new ArrayList<>();
             for (Task task : workingTasks) {
-                if (taskPredecessorsAreNotInList(task, workingTasks)) {
+                if (!existsAtLeastOneInList(task.pred, workingTasks)) {
                     addTaskToPaths(task, paths);
                     toRemove.add(task);
                 }
@@ -205,16 +199,15 @@ public class NetworkDiagram {
         return paths;
     }
 
-    private boolean taskPredecessorsAreNotInList(Task task, List<Task> taskList) {
-        boolean notInList = true;
-        for (String predId : task.pred) {
-            Task predTask = tasks.get(predId);
+    private boolean existsAtLeastOneInList(List<Task> tasks, List<Task> taskList) {
+        boolean inList = false;
+        for (Task predTask : tasks) {
             if (taskList.contains(predTask)) {
-                notInList = false;
+                inList = true;
                 break;
             }
         }
-        return notInList;
+        return inList;
     }
 
     private void addTaskToPaths(Task task, List<List<Task>> paths) {
@@ -235,11 +228,11 @@ public class NetworkDiagram {
     }
 
     private void appendTaskToPaths(Task task, List<Task> predTasks, List<Task> path, List<List<Task>> paths) {
-        if (predTasks.contains(path.get(path.size()-1))) {
+        if (predTasks.contains(path.get(path.size() - 1))) {
             path.add(task);
         } else {
             List<Task> clonedPath = new ArrayList<>(path);
-            clonedPath.remove(clonedPath.size()-1);
+            clonedPath.remove(clonedPath.size() - 1);
             clonedPath.add(task);
             paths.add(clonedPath);
         }
@@ -247,12 +240,15 @@ public class NetworkDiagram {
 
     private List<Task> getTaskPredIsInPath(Task task, List<Task> path) {
         List<Task> predTasks = new ArrayList<>();
-        for (String predId : task.pred) {
-            Task predTask = tasks.get(predId);
-            if (path.contains(predTask)) 
+        for (Task predTask : task.pred) {
+            if (path.contains(predTask))
                 predTasks.add(predTask);
         }
         return predTasks;
+    }
+
+    public Task getTask(String string) {
+        return tasks.get(string);
     }
 
 }
