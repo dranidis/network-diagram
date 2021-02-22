@@ -17,7 +17,7 @@ import org.junit.Test;
 public class NetworkDiagramTest {
     @Test(expected = DuplicateTaskKeyException.class)
     public void read_Should_throw_DuplicateTaskKeyException_WhenDuplicateKeys()
-            throws DuplicateTaskKeyException, KeyNotFoundException {
+            throws DuplicateTaskKeyException, KeyNotFoundException, CircularDependencyException {
         List<TaskJSON> tasklist = new ArrayList<>();
 
         tasklist.add(new TaskJSON("A"));
@@ -29,7 +29,7 @@ public class NetworkDiagramTest {
 
     @Test(expected = KeyNotFoundException.class)
     public void read_Should_throw_KeyNotFoundException_WhenKeyDoesNotExist()
-            throws DuplicateTaskKeyException, KeyNotFoundException {
+            throws DuplicateTaskKeyException, KeyNotFoundException, CircularDependencyException {
 
         List<TaskJSON> taskList = new ArrayList<>();
         taskList.add(new TaskJSON("A", 5, Arrays.asList(new String[] {})));
@@ -38,8 +38,19 @@ public class NetworkDiagramTest {
         nd.readTasklist(taskList);
     }
 
+    // @Test(expected = CircularDependencyException.class)
+    // public void read_Should_throw_CircularDependencyException()
+    //         throws DuplicateTaskKeyException, KeyNotFoundException, CircularDependencyException {
+
+    //     List<TaskJSON> taskList = new ArrayList<>();
+    //     taskList.add(new TaskJSON("A", 5, Arrays.asList(new String[] {})));
+    //     taskList.add(new TaskJSON("B", 3, Arrays.asList(new String[] {"A"})));
+    //     NetworkDiagram nd = new NetworkDiagram();
+    //     nd.readTasklist(taskList);
+    // }    
     @Test
-    public void read_Should_Finish_WhenThereAreNoProblems() throws DuplicateTaskKeyException, KeyNotFoundException {
+    public void read_Should_Finish_WhenThereAreNoProblems() throws DuplicateTaskKeyException, KeyNotFoundException,
+            CircularDependencyException {
 
         List<TaskJSON> taskList = new ArrayList<>();
         taskList.add(new TaskJSON("A", 5, Arrays.asList(new String[] {})));
@@ -54,7 +65,7 @@ public class NetworkDiagramTest {
 
     @Test
     public void earliestStart_Should_Be_Zero_When_ThereAreNoPredecessors()
-            throws DuplicateTaskKeyException, KeyNotFoundException {
+            throws DuplicateTaskKeyException, KeyNotFoundException, CircularDependencyException {
         List<TaskJSON> taskList = new ArrayList<>();
         taskList.add(new TaskJSON("A", 5, Arrays.asList(new String[] {})));
 
@@ -69,7 +80,7 @@ public class NetworkDiagramTest {
 
     @Test
     public void earliestStart_Should_Be_EarliestFinishOfPred_When_ThereisOnePredecessor()
-            throws DuplicateTaskKeyException, KeyNotFoundException {
+            throws DuplicateTaskKeyException, KeyNotFoundException, CircularDependencyException {
         List<TaskJSON> taskList = new ArrayList<>();
         taskList.add(new TaskJSON("A", 5, Arrays.asList(new String[] {})));
         taskList.add(new TaskJSON("B", 3, Arrays.asList(new String[] {"A"})));
@@ -85,7 +96,7 @@ public class NetworkDiagramTest {
 
     @Test
     public void earliestStart_Should_Be_MaxOfEarliestFinishOfPreds_When_ThereAreMorePredecessors()
-            throws DuplicateTaskKeyException, KeyNotFoundException {
+            throws DuplicateTaskKeyException, KeyNotFoundException, CircularDependencyException {
 
         List<TaskJSON> taskList = new ArrayList<>();
         taskList.add(new TaskJSON("A", 5, Arrays.asList(new String[] {})));
@@ -102,7 +113,8 @@ public class NetworkDiagramTest {
     }
 
     @Test
-    public void successors_Should_Corectly_Link_tasks() throws DuplicateTaskKeyException, KeyNotFoundException {
+    public void successors_Should_Corectly_Link_tasks() throws DuplicateTaskKeyException, KeyNotFoundException,
+            CircularDependencyException {
         List<TaskJSON> taskList = new ArrayList<>();
         taskList.add(new TaskJSON("A", 5, Arrays.asList(new String[] {})));
 
@@ -116,7 +128,7 @@ public class NetworkDiagramTest {
 
     @Test
     public void successors_Should_Corectly_Link_tasksBackWards()
-            throws DuplicateTaskKeyException, KeyNotFoundException {
+            throws DuplicateTaskKeyException, KeyNotFoundException, CircularDependencyException {
         List<TaskJSON> taskList = new ArrayList<>();
         taskList.add(new TaskJSON("A", 5, Arrays.asList(new String[] {})));
         taskList.add(new TaskJSON("B", 5, Arrays.asList(new String[] { "A" })));
@@ -138,7 +150,7 @@ public class NetworkDiagramTest {
 
     @Test
     public void latestFinish_Should_Be_earliestFinish_When_ThereAreNoSuccessors()
-            throws DuplicateTaskKeyException, KeyNotFoundException {
+            throws DuplicateTaskKeyException, KeyNotFoundException, CircularDependencyException {
         List<TaskJSON> taskList = new ArrayList<>();
         taskList.add(new TaskJSON("A", 5, Arrays.asList(new String[] {})));
 
@@ -153,7 +165,7 @@ public class NetworkDiagramTest {
 
     @Test
     public void latestFinish_Should_Be_min_of_latestStart_When_ThereAreSuccessors()
-            throws DuplicateTaskKeyException, KeyNotFoundException {
+            throws DuplicateTaskKeyException, KeyNotFoundException, CircularDependencyException {
         List<TaskJSON> taskList = new ArrayList<>();
         taskList.add(new TaskJSON("A", 5, Arrays.asList(new String[] {})));
         taskList.add(new TaskJSON("B", 3, Arrays.asList(new String[] { "A" })));
@@ -177,7 +189,8 @@ public class NetworkDiagramTest {
     }
 
     @Test
-    public void process_Should_WorkWithTransitiveDependencies() throws DuplicateTaskKeyException, KeyNotFoundException {
+    public void process_Should_WorkWithTransitiveDependencies() throws DuplicateTaskKeyException, KeyNotFoundException,
+            CircularDependencyException {
         List<TaskJSON> taskList = new ArrayList<>();
         taskList.add(new TaskJSON("A", 2, Arrays.asList(new String[] {})));
         taskList.add(new TaskJSON("B", 3, Arrays.asList(new String[] { "A" })));
@@ -197,7 +210,8 @@ public class NetworkDiagramTest {
     }
 
     @Test
-    public void criticalPath_Should_Be_Task_When_OnlyOne() throws DuplicateTaskKeyException, KeyNotFoundException {
+    public void criticalPath_Should_Be_Task_When_OnlyOne() throws DuplicateTaskKeyException, KeyNotFoundException,
+            CircularDependencyException {
         List<TaskJSON> taskList = new ArrayList<>();
         taskList.add(new TaskJSON("A", 2, Arrays.asList(new String[] {})));
 
@@ -213,7 +227,8 @@ public class NetworkDiagramTest {
     }
 
     @Test
-    public void criticalPath_Should_Be_OnlyTasksWithSlackZero() throws DuplicateTaskKeyException, KeyNotFoundException {
+    public void criticalPath_Should_Be_OnlyTasksWithSlackZero() throws DuplicateTaskKeyException, KeyNotFoundException,
+            CircularDependencyException {
 
         List<TaskJSON> taskList = new ArrayList<>();
         taskList.add(new TaskJSON("A", 2, Arrays.asList(new String[] {})));
@@ -233,7 +248,8 @@ public class NetworkDiagramTest {
     }
 
     @Test
-    public void criticalPath_Should_ReturnMoreThanOneCPath() throws DuplicateTaskKeyException, KeyNotFoundException {
+    public void criticalPath_Should_ReturnMoreThanOneCPath() throws DuplicateTaskKeyException, KeyNotFoundException,
+            CircularDependencyException {
         List<TaskJSON> taskList = new ArrayList<>();
         taskList.add(new TaskJSON("A", 0, Arrays.asList(new String[] {})));
         taskList.add(new TaskJSON("B", 0, Arrays.asList(new String[] { "A" })));
@@ -258,7 +274,7 @@ public class NetworkDiagramTest {
 
     @Test
     public void criticalPath_Should_WorkWithTransitiveDependencies()
-            throws DuplicateTaskKeyException, KeyNotFoundException {
+            throws DuplicateTaskKeyException, KeyNotFoundException, CircularDependencyException {
         List<TaskJSON> taskList = new ArrayList<>();
         taskList.add(new TaskJSON("A", 0, Arrays.asList(new String[] {})));
         taskList.add(new TaskJSON("B", 0, Arrays.asList(new String[] { "A" })));
@@ -280,7 +296,7 @@ public class NetworkDiagramTest {
 
     @Test
     public void criticalPath_Should_WorkWithTransitiveDependenciesMoreThanOnePath()
-            throws DuplicateTaskKeyException, KeyNotFoundException {
+            throws DuplicateTaskKeyException, KeyNotFoundException, CircularDependencyException {
         List<TaskJSON> taskList = new ArrayList<>();
         taskList.add(new TaskJSON("A", 0, Arrays.asList(new String[] {})));
         taskList.add(new TaskJSON("B", 0, Arrays.asList(new String[] {})));

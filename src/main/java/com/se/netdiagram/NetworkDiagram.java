@@ -22,7 +22,7 @@ public class NetworkDiagram {
      * @throws KeyNotFoundException
      */
     public void readTasklist(List<TaskJSON> taskList)
-            throws DuplicateTaskKeyException, KeyNotFoundException {
+            throws DuplicateTaskKeyException, KeyNotFoundException, CircularDependencyException {
         tasks = new HashMap<>();
 
         for (TaskJSON taskJSON : taskList) {
@@ -45,6 +45,10 @@ public class NetworkDiagram {
                 task.pred.add(predTask);
             }
         }
+        checkCircular();
+    }
+
+    private void checkCircular() throws CircularDependencyException {
     }
 
     public void process() {
@@ -171,6 +175,8 @@ public class NetworkDiagram {
         } catch (DuplicateTaskKeyException e) {
             e.printStackTrace();
         } catch (KeyNotFoundException e) {
+            e.printStackTrace();
+        } catch (CircularDependencyException e) {
             e.printStackTrace();
         }
     }
