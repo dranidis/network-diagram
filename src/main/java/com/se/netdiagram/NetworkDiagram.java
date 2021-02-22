@@ -22,12 +22,12 @@ public class NetworkDiagram {
      * @throws KeyNotFoundException
      */
     public void readTasklist(List<TaskJSON> taskList)
-            throws DuplicateTaskKeyException, KeyNotFoundException {
+            throws DuplicateTaskKeyException, KeyNotFoundException, CircularDependencyException {
         tasks = new HashMap<>();
 
         for (TaskJSON taskJSON : taskList) {
             if (tasks.containsKey(taskJSON.id)) {
-                throw new DuplicateTaskKeyException("Id: " + taskJSON.id + " already exists!");
+                throw new DuplicateTaskKeyException("Task Id: " + taskJSON.id + " already exists!");
             }
             Task task = new Task();
             task.id = taskJSON.id;
@@ -40,15 +40,40 @@ public class NetworkDiagram {
             for (String predId : taskJSON.pred) {
                 Task predTask = tasks.get(predId);
                 if (predTask == null) {
-                    throw new KeyNotFoundException("Not existing pred KEY: " + predId);
+                    throw new KeyNotFoundException("Not existing predecessor KEY: " + predId + " in Task: " + task.id);
                 }
                 task.pred.add(predTask);
             }
         }
+
+        successors();
+
+        List<Task> checked = new ArrayList<>();
+        for (Task task: tasks.values()) {
+            if (!checked.contains(task)) {
+                List<Task> visited = new ArrayList<>();
+                checkCircular(task, visited, checked);
+           }
+        }   
+    }
+
+    private void checkCircular(Task task, List<Task> visited, List<Task> checked) throws CircularDependencyException {
+        for (Task succTask: task.succ) {
+            if (visited.contains(succTask)) {
+                String path = "";
+                for (Task t: visited) {
+                    path += t.id + " -> ";
+                }
+                path += task.id + " -> " +  succTask.id;
+                throw new CircularDependencyException("Circular dependency: " + path);
+            }
+            visited.add(task);
+            checked.add(task);
+            checkCircular(succTask, visited, checked);
+        }
     }
 
     public void process() {
-        successors();
         long projectEnd = forward();
         backward(projectEnd);
     }
@@ -168,10 +193,9 @@ public class NetworkDiagram {
         }
         try {
             readTasklist(taskJSONList);
-        } catch (DuplicateTaskKeyException e) {
-            e.printStackTrace();
-        } catch (KeyNotFoundException e) {
-            e.printStackTrace();
+        } catch (DuplicateTaskKeyException | KeyNotFoundException | CircularDependencyException e) {
+            System.err.println(e.getMessage());
+            System.exit(-1);
         }
     }
 

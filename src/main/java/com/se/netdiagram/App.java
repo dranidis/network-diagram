@@ -6,7 +6,7 @@ package com.se.netdiagram;
  */
 public class App {
     public static void main(String[] args) {
-        String jsonFile = "examples/tasks.json";
+        String jsonFile = "examples/keys.json";
         if(args.length > 0) 
             jsonFile = args[0];
 
