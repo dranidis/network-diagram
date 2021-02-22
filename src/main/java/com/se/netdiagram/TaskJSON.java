@@ -3,6 +3,9 @@ package com.se.netdiagram;
 import java.util.List;
 
 public class TaskJSON {
+    public TaskJSON() {
+    }
+    
     public TaskJSON(String string) {
         id = string;
     }
