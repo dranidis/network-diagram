@@ -7,11 +7,11 @@ import java.util.OptionalLong;
 public class Task {
     public String id;
     public int duration;
-    public List<String> pred;
+    public List<Task> pred = new ArrayList<>();
     public OptionalLong earliestStart;
     public OptionalLong earliestFinish;
     public OptionalLong latestStart;
     public OptionalLong latestFinish;
     public OptionalLong slack;
-    public List<String> succ = new ArrayList<>();
+    public List<Task> succ = new ArrayList<>();
 }
