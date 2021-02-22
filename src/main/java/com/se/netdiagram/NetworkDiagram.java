@@ -58,18 +58,19 @@ public class NetworkDiagram {
     }
 
     private void checkCircular(Task task, List<Task> visited, List<Task> checked) throws CircularDependencyException {
+        List<Task> visitedCopy = new ArrayList<>(visited);
         for (Task succTask : task.succ) {
-            if (visited.contains(succTask)) {
+            if (visitedCopy.contains(succTask)) {
                 String path = "";
-                for (Task t : visited) {
+                for (Task t : visitedCopy) {
                     path += t.id + " -> ";
                 }
                 path += task.id + " -> " + succTask.id;
                 throw new CircularDependencyException("Circular dependency: " + path);
             }
-            visited.add(task);
+            visitedCopy.add(task);
             checked.add(task);
-            checkCircular(succTask, visited, checked);
+            checkCircular(succTask, visitedCopy, checked);
         }
     }
 
