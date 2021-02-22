@@ -38,16 +38,42 @@ public class NetworkDiagramTest {
         nd.readTasklist(taskList);
     }
 
-    // @Test(expected = CircularDependencyException.class)
-    // public void read_Should_throw_CircularDependencyException()
-    //         throws DuplicateTaskKeyException, KeyNotFoundException, CircularDependencyException {
+    @Test(expected = CircularDependencyException.class)
+    public void read_Should_throw_CircularDependencyException()
+            throws DuplicateTaskKeyException, KeyNotFoundException, CircularDependencyException {
 
-    //     List<TaskJSON> taskList = new ArrayList<>();
-    //     taskList.add(new TaskJSON("A", 5, Arrays.asList(new String[] {})));
-    //     taskList.add(new TaskJSON("B", 3, Arrays.asList(new String[] {"A"})));
-    //     NetworkDiagram nd = new NetworkDiagram();
-    //     nd.readTasklist(taskList);
-    // }    
+        List<TaskJSON> taskList = new ArrayList<>();
+        taskList.add(new TaskJSON("A", 5, Arrays.asList(new String[] {"B"})));
+        taskList.add(new TaskJSON("B", 3, Arrays.asList(new String[] {"A"})));
+        NetworkDiagram nd = new NetworkDiagram();
+        nd.readTasklist(taskList);
+    } 
+    
+
+    @Test(expected = CircularDependencyException.class)
+    public void read_Should_throw_CircularDependencyException_WhenThereIsATransitiveCircularDependency()
+            throws DuplicateTaskKeyException, KeyNotFoundException, CircularDependencyException {
+
+        List<TaskJSON> taskList = new ArrayList<>();
+        taskList.add(new TaskJSON("A", 5, Arrays.asList(new String[] {"C"})));
+        taskList.add(new TaskJSON("B", 3, Arrays.asList(new String[] {"A"})));
+        taskList.add(new TaskJSON("C", 3, Arrays.asList(new String[] {"B"})));
+        NetworkDiagram nd = new NetworkDiagram();
+        nd.readTasklist(taskList);
+    }     
+
+    @Test(expected = CircularDependencyException.class)
+    public void read_Should_throw_CircularDependencyException_WhenThereIsATransitiveCircularDependency1()
+            throws DuplicateTaskKeyException, KeyNotFoundException, CircularDependencyException {
+
+        List<TaskJSON> taskList = new ArrayList<>();
+        taskList.add(new TaskJSON("A", 5, Arrays.asList(new String[] {})));
+        taskList.add(new TaskJSON("B", 3, Arrays.asList(new String[] {"A", "C"})));
+        taskList.add(new TaskJSON("C", 3, Arrays.asList(new String[] {"B"})));
+        NetworkDiagram nd = new NetworkDiagram();
+        nd.readTasklist(taskList);
+    }     
+
     @Test
     public void read_Should_Finish_WhenThereAreNoProblems() throws DuplicateTaskKeyException, KeyNotFoundException,
             CircularDependencyException {
