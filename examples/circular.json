@@ -1,23 +1,7 @@
 [
-    {
-        "id": "A",
-        "duration": 1,
-        "pred": [
-            "C"
-        ]
-    },
-    {
-        "id": "B",
-        "duration": 2,
-        "pred": [
-            "A"
-        ]
-    },
-    {
-        "id": "C",
-        "duration": 2,
-        "pred": [
-            "B"
-        ]
-    }
+    { "id": "A", "duration": 1, "pred": [ "C" ] },
+    { "id": "B", "duration": 2, "pred": [ "A" ] },
+    { "id": "C", "duration": 2, "pred": [ "B" ] },
+    { "id": "D", "duration": 2, "pred": [ "E" ] },
+    { "id": "E", "duration": 2, "pred": [] }
 ]

@@ -48,29 +48,13 @@ public class NetworkDiagram {
 
         successors();
 
-        List<Task> checked = new ArrayList<>();
-        for (Task task : tasks.values()) {
-            if (!checked.contains(task)) {
-                List<Task> visited = new ArrayList<>();
-                checkCircular(task, visited, checked);
+        List<Task> circular = Task.getCircularDependency(tasks.values());
+        if (circular != null) {
+            String path = "";
+            for (Task t : circular) {
+                path += t.id + " -> ";
             }
-        }
-    }
-
-    private void checkCircular(Task task, List<Task> visited, List<Task> checked) throws CircularDependencyException {
-        List<Task> visitedCopy = new ArrayList<>(visited);
-        for (Task succTask : task.succ) {
-            if (visitedCopy.contains(succTask)) {
-                String path = "";
-                for (Task t : visitedCopy) {
-                    path += t.id + " -> ";
-                }
-                path += task.id + " -> " + succTask.id;
-                throw new CircularDependencyException("Circular dependency: " + path);
-            }
-            visitedCopy.add(task);
-            checked.add(task);
-            checkCircular(succTask, visitedCopy, checked);
+            throw new CircularDependencyException("Circular dependency: " + path);
         }
     }
 
@@ -225,14 +209,11 @@ public class NetworkDiagram {
     }
 
     private boolean existsAtLeastOneInList(List<Task> tasks, List<Task> taskList) {
-        boolean inList = false;
-        for (Task predTask : tasks) {
-            if (taskList.contains(predTask)) {
-                inList = true;
-                break;
-            }
-        }
-        return inList;
+        for (Task task : tasks)
+            if (taskList.contains(task))
+                return true;
+
+        return false;
     }
 
     private void addTaskToPaths(Task task, List<List<Task>> paths) {

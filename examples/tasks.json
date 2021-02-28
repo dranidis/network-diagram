@@ -1,68 +1,12 @@
 [
-    {
-        "id": "A",
-        "duration": 1,
-        "pred": []
-    },
-    {
-        "id": "B",
-        "duration": 2,
-        "pred": []
-    },
-    {
-        "id": "C",
-        "duration": 2,
-        "pred": [
-            "A",
-            "B"
-        ]
-    },
-    {
-        "id": "D",
-        "duration": 2,
-        "pred": [
-            "B"
-        ]
-    },
-    {
-        "id": "E",
-        "duration": 1,
-        "pred": [
-            "C"
-        ]
-    },
-    {
-        "id": "F",
-        "duration": 2,
-        "pred": [
-            "D",
-            "E",
-            "G"
-        ]
-    },
-    {
-        "id": "G",
-        "duration": 4,
-        "pred": []
-    },
-    {
-        "id": "H",
-        "duration": 1,
-        "pred": [
-            "E",
-            "F"
-        ]
-    },
-    {
-        "id": "I",
-        "duration": 1,
-        "pred": [
-            "F"
-        ]
-    },
-    {
-        "id": "J",
-        "duration": 3,
-        "pred": []
-    }
+    { "id": "A", "duration": 1, "pred": [] },
+    { "id": "B", "duration": 2, "pred": [] },
+    { "id": "C", "duration": 2, "pred": [ "A", "B" ] },
+    { "id": "D", "duration": 2, "pred": [ "B" ] },
+    { "id": "E", "duration": 1, "pred": [ "C" ] },
+    { "id": "F", "duration": 2, "pred": [ "D", "E", "G" ] },
+    { "id": "G", "duration": 4, "pred": [] },
+    { "id": "H", "duration": 1, "pred": [ "E", "F" ] },
+    { "id": "I", "duration": 1, "pred": [ "F" ] },
+    { "id": "J", "duration": 3, "pred": [] }
 ]
