@@ -13,12 +13,12 @@ mvn clean package
 
 Execute on the default file:
 ```
-mvn exec:java -Dexec.mainClass="com.se.netdiagram.App"
+mvn exec:java -quiet  -Dexec.mainClass="com.se.netdiagram.App"
 ```
 
 Execute on the different file:
 ```
-mvn exec:java -Dexec.mainClass="com.se.netdiagram.App" -Dexec.args="examples/tasks2.json"
+mvn exec:java -quiet -Dexec.mainClass="com.se.netdiagram.App" -Dexec.args="examples/tasks2.json"
 ```
 
 Generate a coverage report (target/site/jacoco):
