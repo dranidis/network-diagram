@@ -51,4 +51,22 @@ public class Task {
     public String toString() {
         return id;
     }
+
+	public void prettyprint() {
+        String ANSI_RED = "\u001B[31m";
+        String ANSI_RESET = "\u001B[0m";
+        String criticalTask = " ";
+        if (slack.getAsLong() == 0) {
+            criticalTask = ANSI_RED + "*";
+        }
+        System.out.printf("%s %5s %4d %4d %4d %4d %4d %6d\n", criticalTask, id, duration,
+                earliestStart.getAsLong(), earliestFinish.getAsLong(), latestStart.getAsLong(),
+                latestFinish.getAsLong(), slack.getAsLong());
+        if (!criticalTask.equals(""))
+            System.out.print(ANSI_RESET);
+	}
+
+	public static void prettyprintHeader() {
+        System.out.printf("%s %5s %4s %4s %4s %4s %4s %6s\n", " ", "ID", "DUR", "ES", "EF", "LS", "LF", "SLACK");
+	}
 }

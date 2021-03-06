@@ -144,20 +144,10 @@ public class NetworkDiagram {
     }
 
     public void print() {
-        String ANSI_RED = "\u001B[31m";
-        String ANSI_RESET = "\u001B[0m";
-        System.out.printf("%s %5s %4s %4s %4s %4s %4s %6s\n", " ", "ID", "DUR", "ES", "EF", "LS", "LF", "SLACK");
+        Task.prettyprintHeader();
 
         for (Task task : tasks.values()) {
-            String criticalTask = " ";
-            if (task.slack.getAsLong() == 0) {
-                criticalTask = ANSI_RED + "*";
-            }
-            System.out.printf("%s %5s %4d %4d %4d %4d %4d %6d\n", criticalTask, task.id, task.duration,
-                    task.earliestStart.getAsLong(), task.earliestFinish.getAsLong(), task.latestStart.getAsLong(),
-                    task.latestFinish.getAsLong(), task.slack.getAsLong());
-            if (!criticalTask.equals(""))
-                System.out.print(ANSI_RESET);
+            task.prettyprint();
         }
 
         for (List<Task> path : getCriticalPaths()) {
