@@ -74,8 +74,8 @@ public class NetworkDiagram {
             task.prettyprint();
         }
 
-        for (List<Task> path : getCriticalPaths()) {
-            for (Task task : path) {
+        for (Path path : getCriticalPaths()) {
+            for (Task task : path.tasks()) {
                 System.out.printf("%5s ->", task.id());
             }
             System.out.println(" end");
@@ -83,8 +83,8 @@ public class NetworkDiagram {
 
     }
 
-    public List<List<Task>> getCriticalPaths() {
-        List<List<Task>> paths = new ArrayList<>();
+    public List<Path> getCriticalPaths() {
+        List<Path> paths = new ArrayList<>();
 
         List<Task> workingTasks = new ArrayList<>();
 
@@ -115,9 +115,9 @@ public class NetworkDiagram {
         return false;
     }
 
-    private void addTaskToPaths(Task task, List<List<Task>> paths) {
+    private void addTaskToPaths(Task task, List<Path> paths) {
         boolean added = false;
-        for (List<Task> path : new ArrayList<>(paths)) {
+        for (Path path : new ArrayList<>(paths)) {
             List<Task> predTasks = getTaskPredIsInPath(task, path);
             if (!predTasks.isEmpty()) {
                 appendTaskToPaths(task, predTasks, path, paths);
@@ -125,25 +125,25 @@ public class NetworkDiagram {
             }
         }
         if (!added) {
-            List<Task> path = new ArrayList<>();
+            Path path = new Path();
             path.add(task);
             paths.add(path);
         }
 
     }
 
-    private void appendTaskToPaths(Task task, List<Task> predTasks, List<Task> path, List<List<Task>> paths) {
-        if (predTasks.contains(path.get(path.size() - 1))) {
+    private void appendTaskToPaths(Task task, List<Task> predTasks, Path path, List<Path> paths) {
+        if (predTasks.contains(path.lastTask())) {
             path.add(task);
         } else {
-            List<Task> clonedPath = new ArrayList<>(path);
-            clonedPath.remove(clonedPath.size() - 1);
+            Path clonedPath = new Path(path.tasks());
+            clonedPath.removeLastTask();
             clonedPath.add(task);
             paths.add(clonedPath);
         }
     }
 
-    private List<Task> getTaskPredIsInPath(Task task, List<Task> path) {
+    private List<Task> getTaskPredIsInPath(Task task, Path path) {
         List<Task> predTasks = new ArrayList<>();
         for (Task predTask : task.pred()) {
             if (path.contains(predTask))

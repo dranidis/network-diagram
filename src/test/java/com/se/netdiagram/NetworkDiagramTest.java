@@ -244,7 +244,7 @@ public class NetworkDiagramTest {
         nd.processTaskList(taskList);
         nd.forwardAndBackWard();
 
-        List<List<Task>> paths = nd.getCriticalPaths();
+        List<Path> paths = nd.getCriticalPaths();
 
         assertEquals(1, paths.size());
         assertEquals(1, paths.get(0).size());
@@ -264,7 +264,7 @@ public class NetworkDiagramTest {
         nd.processTaskList(taskList);
         nd.forwardAndBackWard();
 
-        List<List<Task>> paths = nd.getCriticalPaths();
+        List<Path> paths = nd.getCriticalPaths();
 
         assertEquals(1, paths.size());
         assertEquals(2, paths.get(0).size());
@@ -284,7 +284,7 @@ public class NetworkDiagramTest {
         nd.processTaskList(taskList);
         nd.forwardAndBackWard();
 
-        List<List<Task>> paths = nd.getCriticalPaths();
+        List<Path> paths = nd.getCriticalPaths();
 
         assertEquals(2, paths.size());
         assertEquals(2, paths.get(0).size());
@@ -309,7 +309,7 @@ public class NetworkDiagramTest {
         nd.processTaskList(taskList);
         nd.forwardAndBackWard();
 
-        List<List<Task>> paths = nd.getCriticalPaths();
+        List<Path> paths = nd.getCriticalPaths();
 
         assertEquals(1, paths.size());
         assertEquals(3, paths.get(0).size());
@@ -334,7 +334,7 @@ public class NetworkDiagramTest {
         nd.processTaskList(taskList);
         nd.forwardAndBackWard();
 
-        List<List<Task>> paths = nd.getCriticalPaths();
+        List<Path> paths = nd.getCriticalPaths();
 
         assertEquals(8, paths.size());
         for (int i = 0; i < 8; i++) {

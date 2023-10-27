@@ -46,12 +46,12 @@ public class Task {
             }
             if (!checked.contains(succTask)) {
                 List<Task> circular = getCircular(succTask, visitedCopy, checked);
-                if (circular != null) {
+                if (!circular.isEmpty()) {
                     return circular;
                 }
             }
         }
-        return null;
+        return new ArrayList<>();
     }
 
     public String toString() {
