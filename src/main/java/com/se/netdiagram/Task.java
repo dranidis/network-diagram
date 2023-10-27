@@ -111,4 +111,21 @@ public class Task {
         pred.add(predTask);
         predTask.succ.add(this);
     }
+
+    public void calculateEarliestValues() {
+        this.earliestStart = OptionalLong.of(0);
+        for (Task predTask : this.pred()) {
+            this.earliestStart = Util.max(this.earliestStart, predTask.earliestFinish);
+        }
+        this.earliestFinish = OptionalLong.of(this.earliestStart.getAsLong() + this.duration());
+    }
+
+    public void calculateLatestValuesAndSlack(long projectEnd) {
+        this.latestFinish = OptionalLong.of(projectEnd);
+        for (Task succTask : this.succ()) {
+            this.latestFinish = Util.min(this.latestFinish, succTask.latestStart);
+        }
+        this.latestStart = OptionalLong.of(this.latestFinish.getAsLong() - this.duration());
+        this.slack = OptionalLong.of(this.latestFinish.getAsLong() - this.earliestFinish.getAsLong());
+    }
 }

@@ -42,8 +42,8 @@ public class NetworkDiagram {
             List<Task> toRemove = new ArrayList<>();
             for (Task task : workingTasks) {
                 if (!existsAtLeastOneInList(task.pred(), workingTasks)) {
-                    calculateEarliestValues(task);
-                    projectEnd = max(projectEnd, task.earliestFinish);
+                    task.calculateEarliestValues();
+                    projectEnd = Util.max(projectEnd, task.earliestFinish);
                     toRemove.add(task);
                 }
             }
@@ -59,43 +59,12 @@ public class NetworkDiagram {
             List<Task> toRemove = new ArrayList<>();
             for (Task task : workingTasks) {
                 if (!existsAtLeastOneInList(task.succ(), workingTasks)) {
-                    calculateLatestValuesAndSlack(task, projectEnd);
+                    task.calculateLatestValuesAndSlack(projectEnd);
                     toRemove.add(task);
                 }
             }
             workingTasks.removeAll(toRemove);
         }
-    }
-
-    private void calculateEarliestValues(Task task) {
-        task.earliestStart = OptionalLong.of(0);
-        for (Task predTask : task.pred()) {
-            task.earliestStart = max(task.earliestStart, predTask.earliestFinish);
-        }
-        task.earliestFinish = OptionalLong.of(task.earliestStart.getAsLong() + task.duration());
-    }
-
-    private void calculateLatestValuesAndSlack(Task task, long projectEnd) {
-        task.latestFinish = OptionalLong.of(projectEnd);
-        for (Task succTask : task.succ()) {
-            task.latestFinish = min(task.latestFinish, succTask.latestStart);
-        }
-        task.latestStart = OptionalLong.of(task.latestFinish.getAsLong() - task.duration());
-        task.slack = OptionalLong.of(task.latestFinish.getAsLong() - task.earliestFinish.getAsLong());
-    }
-
-    private OptionalLong max(OptionalLong oldMax, OptionalLong newValue) {
-        if (oldMax.getAsLong() < newValue.getAsLong()) {
-            return newValue;
-        }
-        return oldMax;
-    }
-
-    private OptionalLong min(OptionalLong oldMin, OptionalLong newValue) {
-        if (oldMin.getAsLong() > newValue.getAsLong()) {
-            return newValue;
-        }
-        return oldMin;
     }
 
     public void print() {
