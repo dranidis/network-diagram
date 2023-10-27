@@ -14,14 +14,12 @@ public class NetworkDiagram {
      * @throws DuplicateTaskKeyException
      * @throws KeyNotFoundException
      */
-    public void processTaskList(List<TaskData> taskList)
-            throws DuplicateTaskKeyException, KeyNotFoundException, CircularDependencyException {
+    public void processTaskList(List<TaskData> taskList) throws DuplicateTaskKeyException, KeyNotFoundException {
 
         tasks = new HashMap<>();
 
         populateTasksFrom(taskList);
         addPredecessorsToTasksFrom(taskList);
-        checkForCircularDependencies();
     }
 
     public void forwardAndBackWard() {
@@ -155,17 +153,6 @@ public class NetworkDiagram {
     public Task getTask(String string) {
         TaskId taskId = new TaskId(string);
         return tasks.get(taskId);
-    }
-
-    private void checkForCircularDependencies() throws CircularDependencyException {
-        List<Task> circular = Task.getCircularDependency(tasks.values());
-        if (!circular.isEmpty()) {
-            String path = "";
-            for (Task t : circular) {
-                path += t.id() + " -> ";
-            }
-            throw new CircularDependencyException("Circular dependency: " + path);
-        }
     }
 
     private void addPredecessorsToTasksFrom(List<TaskData> taskList) throws KeyNotFoundException {

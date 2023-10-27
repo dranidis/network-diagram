@@ -18,7 +18,7 @@ public class App {
 
         try {
             nd.processTaskList(taskJSONList);
-        } catch (DuplicateTaskKeyException | KeyNotFoundException | CircularDependencyException e) {
+        } catch (DuplicateTaskKeyException | KeyNotFoundException e) {
             System.err.println(e.getMessage());
             System.exit(-1);
         }

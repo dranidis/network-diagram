@@ -22,38 +22,6 @@ public class Task {
         this.duration = duration;
     }
 
-    public static List<Task> getCircularDependency(Collection<Task> tasks) {
-        List<Task> checked = new ArrayList<>();
-        for (Task task : tasks) {
-            if (!checked.contains(task)) {
-                List<Task> visited = new ArrayList<>();
-                List<Task> circular = getCircular(task, visited, checked);
-                if (circular != null)
-                    return circular;
-            }
-        }
-        return new ArrayList<>();
-    }
-
-    private static List<Task> getCircular(Task task, List<Task> visited, List<Task> checked) {
-        List<Task> visitedCopy = new ArrayList<>(visited);
-        visitedCopy.add(task);
-        checked.add(task);
-
-        for (Task succTask : task.succ) {
-            if (visitedCopy.contains(succTask)) {
-                return visitedCopy;
-            }
-            if (!checked.contains(succTask)) {
-                List<Task> circular = getCircular(succTask, visitedCopy, checked);
-                if (!circular.isEmpty()) {
-                    return circular;
-                }
-            }
-        }
-        return new ArrayList<>();
-    }
-
     public String toString() {
         return id.toString();
     }
@@ -99,8 +67,13 @@ public class Task {
      * Adds a predecessor to this task. Also adds this task as a successor to the
      * predecessor.
      * <p>
-     * Domain constraint. - A task cannot be its own predecessor. - A task "A" with
-     * a "B" as predecessor means that "B" must have "A" as a successor.
+     * Domain constraints:
+     * <ul>
+     * <li>A task cannot be its own predecessor.
+     * <li>A task "A" with a "B" as predecessor means that "B" must have "A" as a
+     * successor.
+     * <li>Adding a predecessor should not create a circular dependency.
+     * </ul>
      * 
      * @param predTask
      */
@@ -108,8 +81,28 @@ public class Task {
         if (predTask == this)
             throw new IllegalArgumentException("A task cannot be its own predecessor!");
 
+        if (pred.contains(predTask)) {
+            throw new IllegalArgumentException("A task cannot have the same predecessor twice!");
+        }
+
+        if (this.thereIsACircularDependency(predTask)) {
+            throw new IllegalArgumentException("Adding a predecessor should not create a circular dependency!");
+        }
+
         pred.add(predTask);
         predTask.succ.add(this);
+    }
+
+    private boolean thereIsACircularDependency(Task predTask) {
+        for (Task nextTast : succ) {
+            if (nextTast == predTask) {
+                return true;
+            }
+            if (nextTast.thereIsACircularDependency(predTask)) {
+                return true;
+            }
+        }
+        return false;
     }
 
     public void calculateEarliestValues() {

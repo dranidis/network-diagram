@@ -1,0 +1,11 @@
+[
+    { "id": "A", "duration": 1, "pred": [] },
+    { "id": "B", "duration": 2, "pred": [] },
+    { "id": "C", "duration": 2, "pred": [ "A", "B" , "A"] },
+    { "id": "D", "duration": 3, "pred": [ "B" ] },
+    { "id": "E", "duration": 1, "pred": [ "C" ] },
+    { "id": "F", "duration": 2, "pred": [ "C","D" ] },
+    { "id": "G", "duration": 4, "pred": [] },
+    { "id": "H", "duration": 2, "pred": [ "E", "F" ] },
+    { "id": "I", "duration": 1, "pred": [ "F" ] }
+]
