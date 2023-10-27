@@ -34,34 +34,34 @@ public class NetworkDiagram {
      */
     private long forward() {
         OptionalLong projectEnd = OptionalLong.of(0);
-        List<Task> workingTasks = new ArrayList<>(tasks.values());
+        List<Task> notProcessedTasks = new ArrayList<>(tasks.values());
 
-        while (!workingTasks.isEmpty()) {
-            List<Task> toRemove = new ArrayList<>();
-            for (Task task : workingTasks) {
-                if (!existsAtLeastOneInList(task.pred(), workingTasks)) {
+        while (!notProcessedTasks.isEmpty()) {
+            List<Task> processedTasks = new ArrayList<>();
+            for (Task task : notProcessedTasks) {
+                if (!existsAtLeastOneInList(task.pred(), notProcessedTasks)) {
                     task.calculateEarliestValues();
                     projectEnd = Util.max(projectEnd, task.earliestFinish());
-                    toRemove.add(task);
+                    processedTasks.add(task);
                 }
             }
-            workingTasks.removeAll(toRemove);
+            notProcessedTasks.removeAll(processedTasks);
         }
         return projectEnd.getAsLong();
     }
 
     private void backward(long projectEnd) {
-        List<Task> workingTasks = new ArrayList<>(tasks.values());
+        List<Task> notProcessedTasks = new ArrayList<>(tasks.values());
 
-        while (!workingTasks.isEmpty()) {
-            List<Task> toRemove = new ArrayList<>();
-            for (Task task : workingTasks) {
-                if (!existsAtLeastOneInList(task.succ(), workingTasks)) {
+        while (!notProcessedTasks.isEmpty()) {
+            List<Task> processedTasks = new ArrayList<>();
+            for (Task task : notProcessedTasks) {
+                if (!existsAtLeastOneInList(task.succ(), notProcessedTasks)) {
                     task.calculateLatestValuesAndSlack(projectEnd);
-                    toRemove.add(task);
+                    processedTasks.add(task);
                 }
             }
-            workingTasks.removeAll(toRemove);
+            notProcessedTasks.removeAll(processedTasks);
         }
     }
 
@@ -92,14 +92,14 @@ public class NetworkDiagram {
         }
 
         while (!workingTasks.isEmpty()) {
-            List<Task> toRemove = new ArrayList<>();
+            List<Task> tasksToRemoveFromWorking = new ArrayList<>();
             for (Task task : workingTasks) {
                 if (!existsAtLeastOneInList(task.pred(), workingTasks)) {
                     addTaskToPaths(task, paths);
-                    toRemove.add(task);
+                    tasksToRemoveFromWorking.add(task);
                 }
             }
-            workingTasks.removeAll(toRemove);
+            workingTasks.removeAll(tasksToRemoveFromWorking);
         }
 
         return paths;
