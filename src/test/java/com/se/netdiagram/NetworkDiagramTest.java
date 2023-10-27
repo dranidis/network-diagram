@@ -24,7 +24,7 @@ public class NetworkDiagramTest {
         tasklist.add(new TaskData("A", 5, Arrays.asList(new String[] {})));
 
         NetworkDiagram nd = new NetworkDiagram();
-        nd.readTasklist(tasklist);
+        nd.processTaskList(tasklist);
     }
 
     @Test(expected = KeyNotFoundException.class)
@@ -35,7 +35,7 @@ public class NetworkDiagramTest {
         taskList.add(new TaskData("A", 5, Arrays.asList(new String[] {})));
         taskList.add(new TaskData("B", 3, Arrays.asList(new String[] { "C" })));
         NetworkDiagram nd = new NetworkDiagram();
-        nd.readTasklist(taskList);
+        nd.processTaskList(taskList);
     }
 
     @Test(expected = CircularDependencyException.class)
@@ -46,7 +46,7 @@ public class NetworkDiagramTest {
         taskList.add(new TaskData("A", 5, Arrays.asList(new String[] { "B" })));
         taskList.add(new TaskData("B", 3, Arrays.asList(new String[] { "A" })));
         NetworkDiagram nd = new NetworkDiagram();
-        nd.readTasklist(taskList);
+        nd.processTaskList(taskList);
     }
 
     @Test(expected = CircularDependencyException.class)
@@ -58,7 +58,7 @@ public class NetworkDiagramTest {
         taskList.add(new TaskData("B", 3, Arrays.asList(new String[] { "A" })));
         taskList.add(new TaskData("C", 3, Arrays.asList(new String[] { "B" })));
         NetworkDiagram nd = new NetworkDiagram();
-        nd.readTasklist(taskList);
+        nd.processTaskList(taskList);
     }
 
     @Test(expected = CircularDependencyException.class)
@@ -70,7 +70,7 @@ public class NetworkDiagramTest {
         taskList.add(new TaskData("B", 3, Arrays.asList(new String[] { "A", "C" })));
         taskList.add(new TaskData("C", 3, Arrays.asList(new String[] { "B" })));
         NetworkDiagram nd = new NetworkDiagram();
-        nd.readTasklist(taskList);
+        nd.processTaskList(taskList);
     }
 
     @Test
@@ -82,7 +82,7 @@ public class NetworkDiagramTest {
         taskList.add(new TaskData("B", 3, Arrays.asList(new String[] { "A" })));
 
         NetworkDiagram nd = new NetworkDiagram();
-        nd.readTasklist(taskList);
+        nd.processTaskList(taskList);
 
         assertNotNull(nd.getTask("A"));
         assertNotNull(nd.getTask("B"));
@@ -95,9 +95,9 @@ public class NetworkDiagramTest {
         taskList.add(new TaskData("A", 5, Arrays.asList(new String[] {})));
 
         NetworkDiagram nd = new NetworkDiagram();
-        nd.readTasklist(taskList);
+        nd.processTaskList(taskList);
 
-        nd.process();
+        nd.forwardAndBackWard();
 
         assertEquals(0, nd.getTask("A").earliestStart.getAsLong());
         assertEquals(5, nd.getTask("A").earliestFinish.getAsLong());
@@ -111,9 +111,9 @@ public class NetworkDiagramTest {
         taskList.add(new TaskData("B", 3, Arrays.asList(new String[] { "A" })));
 
         NetworkDiagram nd = new NetworkDiagram();
-        nd.readTasklist(taskList);
+        nd.processTaskList(taskList);
 
-        nd.process();
+        nd.forwardAndBackWard();
 
         assertEquals(5, nd.getTask("B").earliestStart.getAsLong());
         assertEquals(8, nd.getTask("B").earliestFinish.getAsLong());
@@ -129,9 +129,9 @@ public class NetworkDiagramTest {
         taskList.add(new TaskData("C", 2, Arrays.asList(new String[] { "A", "B" })));
 
         NetworkDiagram nd = new NetworkDiagram();
-        nd.readTasklist(taskList);
+        nd.processTaskList(taskList);
 
-        nd.process();
+        nd.forwardAndBackWard();
 
         assertEquals(5, nd.getTask("C").earliestStart.getAsLong());
         assertEquals(7, nd.getTask("C").earliestFinish.getAsLong());
@@ -144,9 +144,9 @@ public class NetworkDiagramTest {
         taskList.add(new TaskData("A", 5, Arrays.asList(new String[] {})));
 
         NetworkDiagram nd = new NetworkDiagram();
-        nd.readTasklist(taskList);
+        nd.processTaskList(taskList);
 
-        nd.process();
+        nd.forwardAndBackWard();
 
         assertEquals(0, nd.getTask("A").succ().size());
     }
@@ -160,9 +160,9 @@ public class NetworkDiagramTest {
         taskList.add(new TaskData("C", 5, Arrays.asList(new String[] { "A", "B" })));
 
         NetworkDiagram nd = new NetworkDiagram();
-        nd.readTasklist(taskList);
+        nd.processTaskList(taskList);
 
-        nd.process();
+        nd.forwardAndBackWard();
 
         assertTrue(nd.getTask("A").succ().stream().map(s -> s.idAsString()).collect(Collectors.toList())
                 .containsAll(Arrays.asList(new String[] { "C", "B" })));
@@ -180,8 +180,8 @@ public class NetworkDiagramTest {
         taskList.add(new TaskData("A", 5, Arrays.asList(new String[] {})));
 
         NetworkDiagram nd = new NetworkDiagram();
-        nd.readTasklist(taskList);
-        nd.process();
+        nd.processTaskList(taskList);
+        nd.forwardAndBackWard();
 
         assertEquals(5, nd.getTask("A").latestFinish.getAsLong());
         assertEquals(0, nd.getTask("A").latestStart.getAsLong());
@@ -197,8 +197,8 @@ public class NetworkDiagramTest {
         taskList.add(new TaskData("C", 2, Arrays.asList(new String[] { "A" })));
 
         NetworkDiagram nd = new NetworkDiagram();
-        nd.readTasklist(taskList);
-        nd.process();
+        nd.processTaskList(taskList);
+        nd.forwardAndBackWard();
 
         assertEquals(8, nd.getTask("C").latestFinish.getAsLong());
         assertEquals(6, nd.getTask("C").latestStart.getAsLong());
@@ -222,8 +222,8 @@ public class NetworkDiagramTest {
         taskList.add(new TaskData("C", 4, Arrays.asList(new String[] { "B", "A" })));
 
         NetworkDiagram nd = new NetworkDiagram();
-        nd.readTasklist(taskList);
-        nd.process();
+        nd.processTaskList(taskList);
+        nd.forwardAndBackWard();
 
         assertEquals(0, nd.getTask("A").earliestStart.getAsLong());
         assertEquals(2, nd.getTask("B").earliestStart.getAsLong());
@@ -241,8 +241,8 @@ public class NetworkDiagramTest {
         taskList.add(new TaskData("A", 2, Arrays.asList(new String[] {})));
 
         NetworkDiagram nd = new NetworkDiagram();
-        nd.readTasklist(taskList);
-        nd.process();
+        nd.processTaskList(taskList);
+        nd.forwardAndBackWard();
 
         List<List<Task>> paths = nd.getCriticalPaths();
 
@@ -261,8 +261,8 @@ public class NetworkDiagramTest {
         taskList.add(new TaskData("C", 2, Arrays.asList(new String[] { "A" })));
 
         NetworkDiagram nd = new NetworkDiagram();
-        nd.readTasklist(taskList);
-        nd.process();
+        nd.processTaskList(taskList);
+        nd.forwardAndBackWard();
 
         List<List<Task>> paths = nd.getCriticalPaths();
 
@@ -281,8 +281,8 @@ public class NetworkDiagramTest {
         taskList.add(new TaskData("C", 0, Arrays.asList(new String[] { "A" })));
 
         NetworkDiagram nd = new NetworkDiagram();
-        nd.readTasklist(taskList);
-        nd.process();
+        nd.processTaskList(taskList);
+        nd.forwardAndBackWard();
 
         List<List<Task>> paths = nd.getCriticalPaths();
 
@@ -306,8 +306,8 @@ public class NetworkDiagramTest {
         taskList.add(new TaskData("C", 0, Arrays.asList(new String[] { "A", "B" })));
 
         NetworkDiagram nd = new NetworkDiagram();
-        nd.readTasklist(taskList);
-        nd.process();
+        nd.processTaskList(taskList);
+        nd.forwardAndBackWard();
 
         List<List<Task>> paths = nd.getCriticalPaths();
 
@@ -331,8 +331,8 @@ public class NetworkDiagramTest {
         taskList.add(new TaskData("F", 0, Arrays.asList(new String[] { "A", "B", "C", "D" })));
 
         NetworkDiagram nd = new NetworkDiagram();
-        nd.readTasklist(taskList);
-        nd.process();
+        nd.processTaskList(taskList);
+        nd.forwardAndBackWard();
 
         List<List<Task>> paths = nd.getCriticalPaths();
 

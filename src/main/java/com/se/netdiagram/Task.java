@@ -32,7 +32,7 @@ public class Task {
                     return circular;
             }
         }
-        return null;
+        return new ArrayList<>();
     }
 
     private static List<Task> getCircular(Task task, List<Task> visited, List<Task> checked) {

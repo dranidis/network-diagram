@@ -5,7 +5,6 @@ import java.util.List;
 /**
  * Reads a list of tasks from a json file, calculates ES, EF, LS, LF, Slack and
  * finds critical paths.
- *
  */
 public class App {
     public static void main(String[] args) {
@@ -16,8 +15,14 @@ public class App {
         NetworkDiagram nd = new NetworkDiagram();
         FileReader fileReader = new FileReader();
         List<TaskData> taskJSONList = fileReader.readJsonFile(jsonFile);
-        nd.preProcess(taskJSONList);
-        nd.process();
+
+        try {
+            nd.processTaskList(taskJSONList);
+        } catch (DuplicateTaskKeyException | KeyNotFoundException | CircularDependencyException e) {
+            System.err.println(e.getMessage());
+            System.exit(-1);
+        }
+        nd.forwardAndBackWard();
         nd.print();
     }
 

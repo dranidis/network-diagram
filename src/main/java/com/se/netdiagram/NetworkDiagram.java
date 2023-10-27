@@ -14,54 +14,17 @@ public class NetworkDiagram {
      * @throws DuplicateTaskKeyException
      * @throws KeyNotFoundException
      */
-    public void readTasklist(List<TaskData> taskList)
+    public void processTaskList(List<TaskData> taskList)
             throws DuplicateTaskKeyException, KeyNotFoundException, CircularDependencyException {
+
         tasks = new HashMap<>();
 
-        for (TaskData taskJSON : taskList) {
-            TaskId taskId = new TaskId(taskJSON.id);
-            if (tasks.containsKey(taskId)) {
-                throw new DuplicateTaskKeyException("Task Id: " + taskId + " already exists!");
-            }
-            Task task = new Task(taskId, taskJSON.duration);
-            tasks.put(task.id(), task);
-        }
-
-        for (TaskData taskJSON : taskList) {
-            TaskId taskId = new TaskId(taskJSON.id);
-            Task task = tasks.get(taskId);
-            for (String predId : taskJSON.pred) {
-                TaskId predTaskId = new TaskId(predId);
-
-                Task predTask = tasks.get(predTaskId);
-                if (predTask == null) {
-                    throw new KeyNotFoundException(
-                            "Not existing predecessor KEY: " + predId + " in Task: " + task.id());
-                }
-                task.addPredecessor(predTask);
-            }
-        }
-
-        List<Task> circular = Task.getCircularDependency(tasks.values());
-        if (circular != null) {
-            String path = "";
-            for (Task t : circular) {
-                path += t.id() + " -> ";
-            }
-            throw new CircularDependencyException("Circular dependency: " + path);
-        }
+        populateTasksFrom(taskList);
+        addPredecessorsToTasksFrom(taskList);
+        checkForCircularDependencies();
     }
 
-    public void preProcess(List<TaskData> taskJSONList) {
-        try {
-            readTasklist(taskJSONList);
-        } catch (DuplicateTaskKeyException | KeyNotFoundException | CircularDependencyException e) {
-            System.err.println(e.getMessage());
-            System.exit(-1);
-        }
-    }
-
-    public void process() {
+    public void forwardAndBackWard() {
         long projectEnd = forward();
         backward(projectEnd);
     }
@@ -225,4 +188,42 @@ public class NetworkDiagram {
         return tasks.get(taskId);
     }
 
+    private void checkForCircularDependencies() throws CircularDependencyException {
+        List<Task> circular = Task.getCircularDependency(tasks.values());
+        if (!circular.isEmpty()) {
+            String path = "";
+            for (Task t : circular) {
+                path += t.id() + " -> ";
+            }
+            throw new CircularDependencyException("Circular dependency: " + path);
+        }
+    }
+
+    private void addPredecessorsToTasksFrom(List<TaskData> taskList) throws KeyNotFoundException {
+        for (TaskData taskJSON : taskList) {
+            TaskId taskId = new TaskId(taskJSON.id);
+            Task task = tasks.get(taskId);
+            for (String predId : taskJSON.pred) {
+                TaskId predTaskId = new TaskId(predId);
+
+                Task predTask = tasks.get(predTaskId);
+                if (predTask == null) {
+                    throw new KeyNotFoundException(
+                            "Not existing predecessor KEY: " + predId + " in Task: " + task.id());
+                }
+                task.addPredecessor(predTask);
+            }
+        }
+    }
+
+    private void populateTasksFrom(List<TaskData> taskList) throws DuplicateTaskKeyException {
+        for (TaskData taskJSON : taskList) {
+            TaskId taskId = new TaskId(taskJSON.id);
+            if (tasks.containsKey(taskId)) {
+                throw new DuplicateTaskKeyException("Task Id: " + taskId + " already exists!");
+            }
+            Task task = new Task(taskId, taskJSON.duration);
+            tasks.put(task.id(), task);
+        }
+    }
 }
