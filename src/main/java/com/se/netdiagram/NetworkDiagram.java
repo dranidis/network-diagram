@@ -23,8 +23,7 @@ public class NetworkDiagram {
             if (tasks.containsKey(taskId)) {
                 throw new DuplicateTaskKeyException("Task Id: " + taskId + " already exists!");
             }
-            Task task = new Task(taskId);
-            task.duration = taskJSON.duration;
+            Task task = new Task(taskId, taskJSON.duration);
             tasks.put(task.id(), task);
         }
 
@@ -39,11 +38,9 @@ public class NetworkDiagram {
                     throw new KeyNotFoundException(
                             "Not existing predecessor KEY: " + predId + " in Task: " + task.id());
                 }
-                task.pred.add(predTask);
+                task.addPredecessor(predTask);
             }
         }
-
-        successors();
 
         List<Task> circular = Task.getCircularDependency(tasks.values());
         if (circular != null) {
@@ -70,17 +67,6 @@ public class NetworkDiagram {
     }
 
     /**
-     * Create succ links
-     */
-    private void successors() {
-        for (Task task : tasks.values()) {
-            for (Task predTask : task.pred) {
-                predTask.succ.add(task);
-            }
-        }
-    }
-
-    /**
      * Makes forward processing assigning values to ES, EF
      * 
      * @return project end
@@ -92,7 +78,7 @@ public class NetworkDiagram {
         while (!workingTasks.isEmpty()) {
             List<Task> toRemove = new ArrayList<>();
             for (Task task : workingTasks) {
-                if (!existsAtLeastOneInList(task.pred, workingTasks)) {
+                if (!existsAtLeastOneInList(task.pred(), workingTasks)) {
                     calculateEarliestValues(task);
                     projectEnd = max(projectEnd, task.earliestFinish);
                     toRemove.add(task);
@@ -109,7 +95,7 @@ public class NetworkDiagram {
         while (!workingTasks.isEmpty()) {
             List<Task> toRemove = new ArrayList<>();
             for (Task task : workingTasks) {
-                if (!existsAtLeastOneInList(task.succ, workingTasks)) {
+                if (!existsAtLeastOneInList(task.succ(), workingTasks)) {
                     calculateLatestValuesAndSlack(task, projectEnd);
                     toRemove.add(task);
                 }
@@ -120,18 +106,18 @@ public class NetworkDiagram {
 
     private void calculateEarliestValues(Task task) {
         task.earliestStart = OptionalLong.of(0);
-        for (Task predTask : task.pred) {
+        for (Task predTask : task.pred()) {
             task.earliestStart = max(task.earliestStart, predTask.earliestFinish);
         }
-        task.earliestFinish = OptionalLong.of(task.earliestStart.getAsLong() + task.duration);
+        task.earliestFinish = OptionalLong.of(task.earliestStart.getAsLong() + task.duration());
     }
 
     private void calculateLatestValuesAndSlack(Task task, long projectEnd) {
         task.latestFinish = OptionalLong.of(projectEnd);
-        for (Task succTask : task.succ) {
+        for (Task succTask : task.succ()) {
             task.latestFinish = min(task.latestFinish, succTask.latestStart);
         }
-        task.latestStart = OptionalLong.of(task.latestFinish.getAsLong() - task.duration);
+        task.latestStart = OptionalLong.of(task.latestFinish.getAsLong() - task.duration());
         task.slack = OptionalLong.of(task.latestFinish.getAsLong() - task.earliestFinish.getAsLong());
     }
 
@@ -178,7 +164,7 @@ public class NetworkDiagram {
         while (!workingTasks.isEmpty()) {
             List<Task> toRemove = new ArrayList<>();
             for (Task task : workingTasks) {
-                if (!existsAtLeastOneInList(task.pred, workingTasks)) {
+                if (!existsAtLeastOneInList(task.pred(), workingTasks)) {
                     addTaskToPaths(task, paths);
                     toRemove.add(task);
                 }
@@ -227,7 +213,7 @@ public class NetworkDiagram {
 
     private List<Task> getTaskPredIsInPath(Task task, List<Task> path) {
         List<Task> predTasks = new ArrayList<>();
-        for (Task predTask : task.pred) {
+        for (Task predTask : task.pred()) {
             if (path.contains(predTask))
                 predTasks.add(predTask);
         }

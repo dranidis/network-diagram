@@ -148,7 +148,7 @@ public class NetworkDiagramTest {
 
         nd.process();
 
-        assertEquals(0, nd.getTask("A").succ.size());
+        assertEquals(0, nd.getTask("A").succ().size());
     }
 
     @Test
@@ -164,13 +164,13 @@ public class NetworkDiagramTest {
 
         nd.process();
 
-        assertTrue(nd.getTask("A").succ.stream().map(s -> s.idAsString()).collect(Collectors.toList())
+        assertTrue(nd.getTask("A").succ().stream().map(s -> s.idAsString()).collect(Collectors.toList())
                 .containsAll(Arrays.asList(new String[] { "C", "B" })));
 
-        assertTrue(nd.getTask("B").succ.stream().map(s -> s.idAsString()).collect(Collectors.toList())
+        assertTrue(nd.getTask("B").succ().stream().map(s -> s.idAsString()).collect(Collectors.toList())
                 .containsAll(Arrays.asList(new String[] { "C" })));
 
-        assertEquals(0, nd.getTask("C").succ.size());
+        assertEquals(0, nd.getTask("C").succ().size());
     }
 
     @Test

@@ -2,22 +2,24 @@ package com.se.netdiagram;
 
 import java.util.ArrayList;
 import java.util.Collection;
+import java.util.Collections;
 import java.util.List;
 import java.util.OptionalLong;
 
 public class Task {
     private TaskId id;
-    public int duration;
-    public List<Task> pred = new ArrayList<>();
+    private int duration;
+    private List<Task> pred = new ArrayList<>();
     public OptionalLong earliestStart;
     public OptionalLong earliestFinish;
     public OptionalLong latestStart;
     public OptionalLong latestFinish;
     public OptionalLong slack;
-    public List<Task> succ = new ArrayList<>();
+    private List<Task> succ = new ArrayList<>();
 
-    public Task(TaskId taskId) {
+    public Task(TaskId taskId, int duration) {
         this.id = taskId;
+        this.duration = duration;
     }
 
     public static List<Task> getCircularDependency(Collection<Task> tasks) {
@@ -79,5 +81,34 @@ public class Task {
 
     public String idAsString() {
         return id.toString();
+    }
+
+    public int duration() {
+        return duration;
+    }
+
+    public List<Task> succ() {
+        return Collections.unmodifiableList(succ);
+    }
+
+    public List<Task> pred() {
+        return Collections.unmodifiableList(pred);
+    }
+
+    /**
+     * Adds a predecessor to this task. Also adds this task as a successor to the
+     * predecessor.
+     * <p>
+     * Domain constraint. - A task cannot be its own predecessor. - A task "A" with
+     * a "B" as predecessor means that "B" must have "A" as a successor.
+     * 
+     * @param predTask
+     */
+    public void addPredecessor(Task predTask) {
+        if (predTask == this)
+            throw new IllegalArgumentException("A task cannot be its own predecessor!");
+
+        pred.add(predTask);
+        predTask.succ.add(this);
     }
 }

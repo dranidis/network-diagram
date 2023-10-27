@@ -1,0 +1,5 @@
+[
+    { "id": "A", "duration": 1, "pred": [] },
+    { "id": "B", "duration": 2, "pred": ["A"] },
+    { "id": "C", "duration": 2, "pred": ["C"] }
+]
