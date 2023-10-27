@@ -43,7 +43,7 @@ public class NetworkDiagram {
             for (Task task : workingTasks) {
                 if (!existsAtLeastOneInList(task.pred(), workingTasks)) {
                     task.calculateEarliestValues();
-                    projectEnd = Util.max(projectEnd, task.earliestFinish);
+                    projectEnd = Util.max(projectEnd, task.earliestFinish());
                     toRemove.add(task);
                 }
             }
@@ -89,7 +89,7 @@ public class NetworkDiagram {
         List<Task> workingTasks = new ArrayList<>();
 
         for (Task task : tasks.values()) {
-            if (task.slack.getAsLong() == 0)
+            if (task.slack().getAsLong() == 0)
                 workingTasks.add(task);
         }
 

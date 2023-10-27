@@ -10,11 +10,11 @@ public class Task {
     private TaskId id;
     private int duration;
     private List<Task> pred = new ArrayList<>();
-    public OptionalLong earliestStart;
-    public OptionalLong earliestFinish;
-    public OptionalLong latestStart;
-    public OptionalLong latestFinish;
-    public OptionalLong slack;
+    private OptionalLong earliestStart;
+    private OptionalLong earliestFinish;
+    private OptionalLong latestStart;
+    private OptionalLong latestFinish;
+    private OptionalLong slack;
     private List<Task> succ = new ArrayList<>();
 
     public Task(TaskId taskId, int duration) {
@@ -127,5 +127,25 @@ public class Task {
         }
         this.latestStart = OptionalLong.of(this.latestFinish.getAsLong() - this.duration());
         this.slack = OptionalLong.of(this.latestFinish.getAsLong() - this.earliestFinish.getAsLong());
+    }
+
+    public OptionalLong slack() {
+        return slack;
+    }
+
+    public OptionalLong earliestFinish() {
+        return earliestFinish;
+    }
+
+    public OptionalLong earliestStart() {
+        return earliestStart;
+    }
+
+    public OptionalLong latestStart() {
+        return latestStart;
+    }
+
+    public OptionalLong latestFinish() {
+        return latestFinish;
     }
 }

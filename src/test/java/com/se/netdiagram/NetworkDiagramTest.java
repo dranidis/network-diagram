@@ -99,8 +99,8 @@ public class NetworkDiagramTest {
 
         nd.forwardAndBackWard();
 
-        assertEquals(0, nd.getTask("A").earliestStart.getAsLong());
-        assertEquals(5, nd.getTask("A").earliestFinish.getAsLong());
+        assertEquals(0, nd.getTask("A").earliestStart().getAsLong());
+        assertEquals(5, nd.getTask("A").earliestFinish().getAsLong());
     }
 
     @Test
@@ -115,8 +115,8 @@ public class NetworkDiagramTest {
 
         nd.forwardAndBackWard();
 
-        assertEquals(5, nd.getTask("B").earliestStart.getAsLong());
-        assertEquals(8, nd.getTask("B").earliestFinish.getAsLong());
+        assertEquals(5, nd.getTask("B").earliestStart().getAsLong());
+        assertEquals(8, nd.getTask("B").earliestFinish().getAsLong());
     }
 
     @Test
@@ -133,8 +133,8 @@ public class NetworkDiagramTest {
 
         nd.forwardAndBackWard();
 
-        assertEquals(5, nd.getTask("C").earliestStart.getAsLong());
-        assertEquals(7, nd.getTask("C").earliestFinish.getAsLong());
+        assertEquals(5, nd.getTask("C").earliestStart().getAsLong());
+        assertEquals(7, nd.getTask("C").earliestFinish().getAsLong());
     }
 
     @Test
@@ -183,9 +183,9 @@ public class NetworkDiagramTest {
         nd.processTaskList(taskList);
         nd.forwardAndBackWard();
 
-        assertEquals(5, nd.getTask("A").latestFinish.getAsLong());
-        assertEquals(0, nd.getTask("A").latestStart.getAsLong());
-        assertEquals(0, nd.getTask("A").slack.getAsLong());
+        assertEquals(5, nd.getTask("A").latestFinish().getAsLong());
+        assertEquals(0, nd.getTask("A").latestStart().getAsLong());
+        assertEquals(0, nd.getTask("A").slack().getAsLong());
     }
 
     @Test
@@ -200,17 +200,17 @@ public class NetworkDiagramTest {
         nd.processTaskList(taskList);
         nd.forwardAndBackWard();
 
-        assertEquals(8, nd.getTask("C").latestFinish.getAsLong());
-        assertEquals(6, nd.getTask("C").latestStart.getAsLong());
-        assertEquals(1, nd.getTask("C").slack.getAsLong());
+        assertEquals(8, nd.getTask("C").latestFinish().getAsLong());
+        assertEquals(6, nd.getTask("C").latestStart().getAsLong());
+        assertEquals(1, nd.getTask("C").slack().getAsLong());
 
-        assertEquals(8, nd.getTask("B").latestFinish.getAsLong());
-        assertEquals(5, nd.getTask("B").latestStart.getAsLong());
-        assertEquals(0, nd.getTask("B").slack.getAsLong());
+        assertEquals(8, nd.getTask("B").latestFinish().getAsLong());
+        assertEquals(5, nd.getTask("B").latestStart().getAsLong());
+        assertEquals(0, nd.getTask("B").slack().getAsLong());
 
-        assertEquals(5, nd.getTask("A").latestFinish.getAsLong());
-        assertEquals(0, nd.getTask("A").latestStart.getAsLong());
-        assertEquals(0, nd.getTask("A").slack.getAsLong());
+        assertEquals(5, nd.getTask("A").latestFinish().getAsLong());
+        assertEquals(0, nd.getTask("A").latestStart().getAsLong());
+        assertEquals(0, nd.getTask("A").slack().getAsLong());
     }
 
     @Test
@@ -225,13 +225,13 @@ public class NetworkDiagramTest {
         nd.processTaskList(taskList);
         nd.forwardAndBackWard();
 
-        assertEquals(0, nd.getTask("A").earliestStart.getAsLong());
-        assertEquals(2, nd.getTask("B").earliestStart.getAsLong());
-        assertEquals(5, nd.getTask("C").earliestStart.getAsLong());
+        assertEquals(0, nd.getTask("A").earliestStart().getAsLong());
+        assertEquals(2, nd.getTask("B").earliestStart().getAsLong());
+        assertEquals(5, nd.getTask("C").earliestStart().getAsLong());
 
-        assertEquals(2, nd.getTask("A").latestFinish.getAsLong());
-        assertEquals(5, nd.getTask("B").latestFinish.getAsLong());
-        assertEquals(9, nd.getTask("C").latestFinish.getAsLong());
+        assertEquals(2, nd.getTask("A").latestFinish().getAsLong());
+        assertEquals(5, nd.getTask("B").latestFinish().getAsLong());
+        assertEquals(9, nd.getTask("C").latestFinish().getAsLong());
     }
 
     @Test
