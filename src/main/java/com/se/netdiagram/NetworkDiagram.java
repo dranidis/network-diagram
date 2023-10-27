@@ -5,42 +5,39 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.OptionalLong;
-import java.io.File;
-import java.io.IOException;
-
-import com.fasterxml.jackson.core.type.TypeReference;
-import com.fasterxml.jackson.databind.ObjectMapper;
-import com.fasterxml.jackson.datatype.jdk8.Jdk8Module;
 
 public class NetworkDiagram {
-    private Map<String, Task> tasks = new HashMap<>();
+    private Map<TaskId, Task> tasks = new HashMap<>();
 
     /**
-     * 
      * @param taskList
      * @throws DuplicateTaskKeyException
      * @throws KeyNotFoundException
      */
-    public void readTasklist(List<TaskJSON> taskList)
+    public void readTasklist(List<TaskData> taskList)
             throws DuplicateTaskKeyException, KeyNotFoundException, CircularDependencyException {
         tasks = new HashMap<>();
 
-        for (TaskJSON taskJSON : taskList) {
-            if (tasks.containsKey(taskJSON.id)) {
-                throw new DuplicateTaskKeyException("Task Id: " + taskJSON.id + " already exists!");
+        for (TaskData taskJSON : taskList) {
+            TaskId taskId = new TaskId(taskJSON.id);
+            if (tasks.containsKey(taskId)) {
+                throw new DuplicateTaskKeyException("Task Id: " + taskId + " already exists!");
             }
-            Task task = new Task();
-            task.id = taskJSON.id;
+            Task task = new Task(taskId);
             task.duration = taskJSON.duration;
-            tasks.put(task.id, task);
+            tasks.put(task.id(), task);
         }
 
-        for (TaskJSON taskJSON : taskList) {
-            Task task = tasks.get(taskJSON.id);
+        for (TaskData taskJSON : taskList) {
+            TaskId taskId = new TaskId(taskJSON.id);
+            Task task = tasks.get(taskId);
             for (String predId : taskJSON.pred) {
-                Task predTask = tasks.get(predId);
+                TaskId predTaskId = new TaskId(predId);
+
+                Task predTask = tasks.get(predTaskId);
                 if (predTask == null) {
-                    throw new KeyNotFoundException("Not existing predecessor KEY: " + predId + " in Task: " + task.id);
+                    throw new KeyNotFoundException(
+                            "Not existing predecessor KEY: " + predId + " in Task: " + task.id());
                 }
                 task.pred.add(predTask);
             }
@@ -52,9 +49,18 @@ public class NetworkDiagram {
         if (circular != null) {
             String path = "";
             for (Task t : circular) {
-                path += t.id + " -> ";
+                path += t.id() + " -> ";
             }
             throw new CircularDependencyException("Circular dependency: " + path);
+        }
+    }
+
+    public void preProcess(List<TaskData> taskJSONList) {
+        try {
+            readTasklist(taskJSONList);
+        } catch (DuplicateTaskKeyException | KeyNotFoundException | CircularDependencyException e) {
+            System.err.println(e.getMessage());
+            System.exit(-1);
         }
     }
 
@@ -152,30 +158,11 @@ public class NetworkDiagram {
 
         for (List<Task> path : getCriticalPaths()) {
             for (Task task : path) {
-                System.out.printf("%5s ->", task.id);
+                System.out.printf("%5s ->", task.id());
             }
             System.out.println(" end");
         }
 
-    }
-
-    public void readJsonFile(String fileName) {
-        ObjectMapper mapper = new ObjectMapper();
-        mapper.registerModule(new Jdk8Module());
-        List<TaskJSON> taskJSONList;
-        try {
-            taskJSONList = mapper.readValue(new File(fileName), new TypeReference<List<TaskJSON>>() {
-            });
-        } catch (IOException e) {
-            e.printStackTrace();
-            return;
-        }
-        try {
-            readTasklist(taskJSONList);
-        } catch (DuplicateTaskKeyException | KeyNotFoundException | CircularDependencyException e) {
-            System.err.println(e.getMessage());
-            System.exit(-1);
-        }
     }
 
     public List<List<Task>> getCriticalPaths() {
@@ -248,7 +235,8 @@ public class NetworkDiagram {
     }
 
     public Task getTask(String string) {
-        return tasks.get(string);
+        TaskId taskId = new TaskId(string);
+        return tasks.get(taskId);
     }
 
 }

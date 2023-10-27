@@ -1,5 +1,7 @@
 package com.se.netdiagram;
 
+import java.util.List;
+
 /**
  * Reads a list of tasks from a json file, calculates ES, EF, LS, LF, Slack and
  * finds critical paths.
@@ -12,7 +14,9 @@ public class App {
             jsonFile = args[0];
 
         NetworkDiagram nd = new NetworkDiagram();
-        nd.readJsonFile(jsonFile);
+        FileReader fileReader = new FileReader();
+        List<TaskData> taskJSONList = fileReader.readJsonFile(jsonFile);
+        nd.preProcess(taskJSONList);
         nd.process();
         nd.print();
     }
