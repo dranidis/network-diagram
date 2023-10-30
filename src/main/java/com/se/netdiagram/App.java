@@ -3,6 +3,7 @@ package com.se.netdiagram;
 import com.se.netdiagram.application.JSONReaderService;
 import com.se.netdiagram.application.PrinterService;
 import com.se.netdiagram.domain.model.NetworkDiagram;
+import com.se.netdiagram.port.adapter.ConsoleNetworkDiagramPrinter;
 import com.se.netdiagram.port.adapter.JSONFileTaskDataReader;
 
 /**
@@ -11,14 +12,18 @@ import com.se.netdiagram.port.adapter.JSONFileTaskDataReader;
  */
 public class App {
     public static void main(String[] args) {
+        /**
+         * Default json file
+         */
         String jsonFile = "examples/tasks.json";
+
         if (args.length > 0)
             jsonFile = args[0];
 
         NetworkDiagram nd = JSONReaderService.readNetworkDiagramWith(
                 new JSONFileTaskDataReader(jsonFile));
 
-        PrinterService.print(nd);
+        PrinterService.printTasksAndCriticalPaths(nd, new ConsoleNetworkDiagramPrinter());
     }
 
 }

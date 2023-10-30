@@ -31,15 +31,15 @@ public class NetworkDiagram {
         tasks.put(task.id(), task);
     }
 
-    public void addPredecessorsToTask(String id, List<String> predIds) throws KeyNotFoundException {
-        TaskId taskId = new TaskId(id);
+    public void addPredecessorsToTask(String aTaskId, List<String> predIds) throws KeyNotFoundException {
+        TaskId taskId = new TaskId(aTaskId);
         Task task = tasks.get(taskId);
-        for (String predId : predIds) {
-            TaskId predTaskId = new TaskId(predId);
+        for (String aPredId : predIds) {
+            TaskId predTaskId = new TaskId(aPredId);
 
             Task predTask = tasks.get(predTaskId);
             if (predTask == null) {
-                throw new KeyNotFoundException("Not existing predecessor KEY: " + predId + " in Task: " + task.id());
+                throw new KeyNotFoundException("Not existing predecessor KEY: " + aPredId + " in Task: " + task.id());
             }
             task.addPredecessor(predTask);
         }

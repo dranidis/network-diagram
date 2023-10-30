@@ -18,7 +18,7 @@ public class Task {
     private OptionalLong latestFinish;
     private OptionalLong slack;
 
-    public Task(TaskId taskId, int duration) {
+    protected Task(TaskId taskId, int duration) {
         this.id = taskId;
         this.duration = duration;
     }
@@ -61,7 +61,7 @@ public class Task {
      * 
      * @param predTask
      */
-    public void addPredecessor(Task predTask) {
+    protected void addPredecessor(Task predTask) {
         if (predTask == this)
             throw new IllegalArgumentException("A task cannot be its own predecessor!");
 
