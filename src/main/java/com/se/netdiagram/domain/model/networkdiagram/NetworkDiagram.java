@@ -74,10 +74,9 @@ public class NetworkDiagram {
             throw new KeyNotFoundException("Not existing predecessor KEY: " + aPredId + " in Task: " + task.id());
         }
 
-        task.addPredecessor(predTask);
+        task.addPredecessor(new Dependency(predTask, DependencyType.valueOf(dependencyType)));
 
         forwardAndBackWard();
-
     }
 
     private void forwardAndBackWard() {
@@ -147,11 +146,12 @@ public class NetworkDiagram {
         }
     }
 
-    private boolean existsAtLeastOneInList(List<Task> tasks, List<Task> taskList) {
-        for (Task task : tasks)
+    private boolean existsAtLeastOneInList(List<Dependency> dependencies, List<Task> taskList) {
+        for (Dependency dependency : dependencies) {
+            Task task = dependency.task();
             if (taskList.contains(task))
                 return true;
-
+        }
         return false;
     }
 
@@ -184,7 +184,8 @@ public class NetworkDiagram {
 
     private List<Task> getTaskPredIsInPath(Task task, Path path) {
         List<Task> predTasks = new ArrayList<>();
-        for (Task predTask : task.predecessors()) {
+        for (Dependency predDependency : task.predecessors()) {
+            Task predTask = predDependency.task();
             if (path.containsTask(predTask))
                 predTasks.add(predTask);
         }

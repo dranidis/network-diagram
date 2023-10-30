@@ -157,10 +157,10 @@ public class DiagramNetworkReaderServiceTest {
         NetworkDiagram nd = new NetworkDiagram();
         DiagramNetworkReaderService.processTaskList(nd, taskList);
 
-        assertTrue(nd.getTask("A").successors().stream().map(s -> s.idAsString()).collect(Collectors.toList())
+        assertTrue(nd.getTask("A").successors().stream().map(s -> s.task().idAsString()).collect(Collectors.toList())
                 .containsAll(Arrays.asList(new String[] { "C", "B" })));
 
-        assertTrue(nd.getTask("B").successors().stream().map(s -> s.idAsString()).collect(Collectors.toList())
+        assertTrue(nd.getTask("B").successors().stream().map(s -> s.task().idAsString()).collect(Collectors.toList())
                 .containsAll(Arrays.asList(new String[] { "C" })));
 
         assertEquals(0, nd.getTask("C").successors().size());

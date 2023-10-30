@@ -10,8 +10,8 @@ import com.se.netdiagram.domain.model.utilities.Util;
 public class Task {
     private TaskId id;
     private int duration;
-    private List<Task> predecessors = new ArrayList<>();
-    private List<Task> successors = new ArrayList<>();
+    private List<Dependency> predecessors = new ArrayList<>();
+    private List<Dependency> successors = new ArrayList<>();
     private OptionalLong earliestStart;
     private OptionalLong earliestFinish;
     private OptionalLong latestStart;
@@ -47,11 +47,11 @@ public class Task {
         return duration;
     }
 
-    public List<Task> successors() {
+    public List<Dependency> successors() {
         return Collections.unmodifiableList(successors);
     }
 
-    public List<Task> predecessors() {
+    public List<Dependency> predecessors() {
         return Collections.unmodifiableList(predecessors);
     }
 
@@ -67,32 +67,35 @@ public class Task {
      * <li>Adding a predecessor should not create a circular dependency.
      * </ul>
      * 
-     * @param predTask
+     * @param predDependency
      */
-    protected void addPredecessor(Task predTask) {
-        if (predTask == this)
+    protected void addPredecessor(Dependency predDependency) {
+        if (predDependency.task() == this)
             throw new IllegalArgumentException("A task cannot be its own predecessor!");
 
-        if (predecessors.contains(predTask)) {
+        if (predecessors.contains(predDependency)) {
             throw new IllegalArgumentException("A task cannot have the same predecessor twice!");
         }
 
-        if (this.additionOfTaskCreatesACircularDepenendency(predTask)) {
+        if (this.additionOfDependencyCreatesACircularDepenendency(predDependency)) {
             throw new IllegalArgumentException("Adding a predecessor should not create a circular dependency!");
         }
 
-        predecessors.add(predTask);
-        predTask.successors.add(this);
+        predecessors.add(predDependency);
+        predDependency.task().successors.add(new Dependency(this, DependencyType.FS));
 
         setEarliestAndLatestValuesToEmpty();
     }
 
-    private boolean additionOfTaskCreatesACircularDepenendency(Task predTask) {
-        for (Task nextTask : successors) {
-            if (nextTask == predTask) {
+    private boolean additionOfDependencyCreatesACircularDepenendency(Dependency predDependency) {
+        for (Dependency dependency : successors) {
+            Task nextTask = dependency.task();
+
+            if (nextTask == predDependency.task()) {
                 return true;
             }
-            if (nextTask.additionOfTaskCreatesACircularDepenendency(predTask)) {
+
+            if (nextTask.additionOfDependencyCreatesACircularDepenendency(predDependency)) {
                 return true;
             }
         }
@@ -101,7 +104,8 @@ public class Task {
 
     protected void calculateEarliestValues() {
         this.earliestStart = OptionalLong.of(0);
-        for (Task predTask : this.predecessors()) {
+        for (Dependency predDependency : this.predecessors()) {
+            Task predTask = predDependency.task();
             this.earliestStart = Util.max(this.earliestStart, predTask.earliestFinish);
         }
         this.earliestFinish = OptionalLong.of(this.earliestStart.getAsLong() + this.duration());
@@ -109,7 +113,8 @@ public class Task {
 
     protected void calculateLatestValuesAndSlack(long projectEnd) {
         this.latestFinish = OptionalLong.of(projectEnd);
-        for (Task succTask : this.successors()) {
+        for (Dependency succDependency : this.successors()) {
+            Task succTask = succDependency.task();
             this.latestFinish = Util.min(this.latestFinish, succTask.latestStart);
         }
         this.latestStart = OptionalLong.of(this.latestFinish.getAsLong() - this.duration());

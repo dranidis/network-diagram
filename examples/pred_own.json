@@ -1,5 +1,5 @@
 [
     { "id": "A", "duration": 1, "predIds": [] },
-    { "id": "B", "duration": 2, "predIds": ["A"] },
-    { "id": "C", "duration": 2, "predIds": ["C"] }
+    { "id": "B", "duration": 2, "predIds": [{ "id": "A", "type": "FS" }] },
+    { "id": "C", "duration": 2, "predIds": [{ "id": "C", "type": "FS" }] }
 ]

@@ -1,12 +1,16 @@
 package com.se.netdiagram.domain.model.networkdiagram;
 
 public class Dependency {
-    private String id;
+    private Task task;
     private DependencyType type;
 
-    public Dependency(String id, DependencyType type) {
-        this.id = id;
+    public Dependency(Task task, DependencyType type) {
+        this.task = task;
         this.type = type;
+    }
+
+    public Task task() {
+        return task;
     }
 
 }
