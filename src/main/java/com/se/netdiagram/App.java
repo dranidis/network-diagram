@@ -1,6 +1,6 @@
 package com.se.netdiagram;
 
-import com.se.netdiagram.application.JSONReaderService;
+import com.se.netdiagram.application.DiagramNetworkReaderService;
 import com.se.netdiagram.application.PrinterService;
 import com.se.netdiagram.domain.model.NetworkDiagram;
 import com.se.netdiagram.port.adapter.ConsoleNetworkDiagramPrinter;
@@ -20,7 +20,7 @@ public class App {
         if (args.length > 0)
             jsonFile = args[0];
 
-        NetworkDiagram nd = JSONReaderService.readNetworkDiagramWith(
+        NetworkDiagram nd = DiagramNetworkReaderService.readNetworkDiagramWith(
                 new JSONFileTaskDataReader(jsonFile));
 
         PrinterService.printTasksAndCriticalPaths(nd, new ConsoleNetworkDiagramPrinter());

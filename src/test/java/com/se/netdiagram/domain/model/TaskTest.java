@@ -1,9 +1,6 @@
-package com.se.netdiagram;
+package com.se.netdiagram.domain.model;
 
 import org.junit.Test;
-
-import com.se.netdiagram.domain.model.Task;
-import com.se.netdiagram.domain.model.TaskId;
 
 public class TaskTest {
 

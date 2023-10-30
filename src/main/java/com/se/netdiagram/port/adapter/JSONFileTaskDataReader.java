@@ -2,7 +2,6 @@ package com.se.netdiagram.port.adapter;
 
 import java.util.List;
 
-import com.se.netdiagram.FileReader;
 import com.se.netdiagram.application.TaskData;
 import com.se.netdiagram.application.TaskDataReader;
 

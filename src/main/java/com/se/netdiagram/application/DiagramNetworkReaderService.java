@@ -6,9 +6,9 @@ import com.se.netdiagram.domain.model.NetworkDiagram;
 import com.se.netdiagram.domain.model.exceptions.DuplicateTaskKeyException;
 import com.se.netdiagram.domain.model.exceptions.KeyNotFoundException;
 
-public class JSONReaderService {
+public class DiagramNetworkReaderService {
 
-    private JSONReaderService() {
+    private DiagramNetworkReaderService() {
     }
 
     public static NetworkDiagram readNetworkDiagramWith(TaskDataReader taskDataReader) {
@@ -33,7 +33,7 @@ public class JSONReaderService {
      * @throws DuplicateTaskKeyException
      * @throws KeyNotFoundException
      */
-    public static void processTaskList(NetworkDiagram nd, List<TaskData> taskList)
+    protected static void processTaskList(NetworkDiagram nd, List<TaskData> taskList)
             throws DuplicateTaskKeyException, KeyNotFoundException {
         populateTasksFrom(nd, taskList);
         addPredecessorsToTasksFrom(nd, taskList);

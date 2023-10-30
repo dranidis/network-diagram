@@ -1,4 +1,4 @@
-package com.se.netdiagram;
+package com.se.netdiagram.port.adapter;
 
 import java.io.File;
 import java.io.IOException;
