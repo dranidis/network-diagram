@@ -1,7 +1,6 @@
 package com.se.netdiagram;
 
 import java.util.ArrayList;
-import java.util.Collection;
 import java.util.Collections;
 import java.util.List;
 import java.util.OptionalLong;
@@ -9,13 +8,13 @@ import java.util.OptionalLong;
 public class Task {
     private TaskId id;
     private int duration;
-    private List<Task> pred = new ArrayList<>();
+    private List<Task> predecessors = new ArrayList<>();
+    private List<Task> successors = new ArrayList<>();
     private OptionalLong earliestStart;
     private OptionalLong earliestFinish;
     private OptionalLong latestStart;
     private OptionalLong latestFinish;
     private OptionalLong slack;
-    private List<Task> succ = new ArrayList<>();
 
     public Task(TaskId taskId, int duration) {
         this.id = taskId;
@@ -24,23 +23,6 @@ public class Task {
 
     public String toString() {
         return id.toString();
-    }
-
-    public void prettyprint() {
-        String ANSI_RED = "\u001B[31m";
-        String ANSI_RESET = "\u001B[0m";
-        String criticalTask = " ";
-        if (slack.getAsLong() == 0) {
-            criticalTask = ANSI_RED + "*";
-        }
-        System.out.printf("%s %5s %4d %4d %4d %4d %4d %6d\n", criticalTask, id, duration, earliestStart.getAsLong(),
-                earliestFinish.getAsLong(), latestStart.getAsLong(), latestFinish.getAsLong(), slack.getAsLong());
-        if (!criticalTask.equals(""))
-            System.out.print(ANSI_RESET);
-    }
-
-    public static void prettyprintHeader() {
-        System.out.printf("%s %5s %4s %4s %4s %4s %4s %6s\n", " ", "ID", "DUR", "ES", "EF", "LS", "LF", "SLACK");
     }
 
     public TaskId id() {
@@ -55,12 +37,12 @@ public class Task {
         return duration;
     }
 
-    public List<Task> succ() {
-        return Collections.unmodifiableList(succ);
+    public List<Task> successors() {
+        return Collections.unmodifiableList(successors);
     }
 
-    public List<Task> pred() {
-        return Collections.unmodifiableList(pred);
+    public List<Task> predecessors() {
+        return Collections.unmodifiableList(predecessors);
     }
 
     /**
@@ -81,24 +63,24 @@ public class Task {
         if (predTask == this)
             throw new IllegalArgumentException("A task cannot be its own predecessor!");
 
-        if (pred.contains(predTask)) {
+        if (predecessors.contains(predTask)) {
             throw new IllegalArgumentException("A task cannot have the same predecessor twice!");
         }
 
-        if (this.thereIsACircularDependency(predTask)) {
+        if (this.additionOfTaskCreatesACircularDepenendency(predTask)) {
             throw new IllegalArgumentException("Adding a predecessor should not create a circular dependency!");
         }
 
-        pred.add(predTask);
-        predTask.succ.add(this);
+        predecessors.add(predTask);
+        predTask.successors.add(this);
     }
 
-    private boolean thereIsACircularDependency(Task predTask) {
-        for (Task nextTast : succ) {
-            if (nextTast == predTask) {
+    private boolean additionOfTaskCreatesACircularDepenendency(Task predTask) {
+        for (Task nextTask : successors) {
+            if (nextTask == predTask) {
                 return true;
             }
-            if (nextTast.thereIsACircularDependency(predTask)) {
+            if (nextTask.additionOfTaskCreatesACircularDepenendency(predTask)) {
                 return true;
             }
         }
@@ -107,7 +89,7 @@ public class Task {
 
     public void calculateEarliestValues() {
         this.earliestStart = OptionalLong.of(0);
-        for (Task predTask : this.pred()) {
+        for (Task predTask : this.predecessors()) {
             this.earliestStart = Util.max(this.earliestStart, predTask.earliestFinish);
         }
         this.earliestFinish = OptionalLong.of(this.earliestStart.getAsLong() + this.duration());
@@ -115,7 +97,7 @@ public class Task {
 
     public void calculateLatestValuesAndSlack(long projectEnd) {
         this.latestFinish = OptionalLong.of(projectEnd);
-        for (Task succTask : this.succ()) {
+        for (Task succTask : this.successors()) {
             this.latestFinish = Util.min(this.latestFinish, succTask.latestStart);
         }
         this.latestStart = OptionalLong.of(this.latestFinish.getAsLong() - this.duration());

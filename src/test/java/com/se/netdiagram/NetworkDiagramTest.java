@@ -145,7 +145,7 @@ public class NetworkDiagramTest {
 
         nd.forwardAndBackWard();
 
-        assertEquals(0, nd.getTask("A").succ().size());
+        assertEquals(0, nd.getTask("A").successors().size());
     }
 
     @Test
@@ -161,13 +161,13 @@ public class NetworkDiagramTest {
 
         nd.forwardAndBackWard();
 
-        assertTrue(nd.getTask("A").succ().stream().map(s -> s.idAsString()).collect(Collectors.toList())
+        assertTrue(nd.getTask("A").successors().stream().map(s -> s.idAsString()).collect(Collectors.toList())
                 .containsAll(Arrays.asList(new String[] { "C", "B" })));
 
-        assertTrue(nd.getTask("B").succ().stream().map(s -> s.idAsString()).collect(Collectors.toList())
+        assertTrue(nd.getTask("B").successors().stream().map(s -> s.idAsString()).collect(Collectors.toList())
                 .containsAll(Arrays.asList(new String[] { "C" })));
 
-        assertEquals(0, nd.getTask("C").succ().size());
+        assertEquals(0, nd.getTask("C").successors().size());
     }
 
     @Test

@@ -3,6 +3,8 @@ package com.se.netdiagram;
 import java.util.OptionalLong;
 
 public class Util {
+    private Util() {
+    }
 
     public static OptionalLong max(OptionalLong oldMax, OptionalLong newValue) {
         if (oldMax.getAsLong() < newValue.getAsLong()) {

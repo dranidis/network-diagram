@@ -1,6 +1,7 @@
 package com.se.netdiagram;
 
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -8,6 +9,19 @@ import java.util.OptionalLong;
 
 public class NetworkDiagram {
     private Map<TaskId, Task> tasks = new HashMap<>();
+
+    /**
+     * Returns all tasks inside the network diagram
+     * 
+     * @return
+     */
+    public Collection<Task> tasks() {
+        return this.tasks.values();
+    }
+
+    public Task getTask(String string) {
+        return tasks.get(new TaskId(string));
+    }
 
     /**
      * @param taskList
@@ -39,7 +53,7 @@ public class NetworkDiagram {
         while (!notProcessedTasks.isEmpty()) {
             List<Task> processedTasks = new ArrayList<>();
             for (Task task : notProcessedTasks) {
-                if (!existsAtLeastOneInList(task.pred(), notProcessedTasks)) {
+                if (!existsAtLeastOneInList(task.predecessors(), notProcessedTasks)) {
                     task.calculateEarliestValues();
                     projectEnd = Util.max(projectEnd, task.earliestFinish());
                     processedTasks.add(task);
@@ -56,29 +70,13 @@ public class NetworkDiagram {
         while (!notProcessedTasks.isEmpty()) {
             List<Task> processedTasks = new ArrayList<>();
             for (Task task : notProcessedTasks) {
-                if (!existsAtLeastOneInList(task.succ(), notProcessedTasks)) {
+                if (!existsAtLeastOneInList(task.successors(), notProcessedTasks)) {
                     task.calculateLatestValuesAndSlack(projectEnd);
                     processedTasks.add(task);
                 }
             }
             notProcessedTasks.removeAll(processedTasks);
         }
-    }
-
-    public void print() {
-        Task.prettyprintHeader();
-
-        for (Task task : tasks.values()) {
-            task.prettyprint();
-        }
-
-        for (Path path : getCriticalPaths()) {
-            for (Task task : path.tasks()) {
-                System.out.printf("%5s ->", task.id());
-            }
-            System.out.println(" end");
-        }
-
     }
 
     public List<Path> getCriticalPaths() {
@@ -94,7 +92,7 @@ public class NetworkDiagram {
         while (!workingTasks.isEmpty()) {
             List<Task> tasksToRemoveFromWorking = new ArrayList<>();
             for (Task task : workingTasks) {
-                if (!existsAtLeastOneInList(task.pred(), workingTasks)) {
+                if (!existsAtLeastOneInList(task.predecessors(), workingTasks)) {
                     addTaskToPaths(task, paths);
                     tasksToRemoveFromWorking.add(task);
                 }
@@ -143,16 +141,11 @@ public class NetworkDiagram {
 
     private List<Task> getTaskPredIsInPath(Task task, Path path) {
         List<Task> predTasks = new ArrayList<>();
-        for (Task predTask : task.pred()) {
+        for (Task predTask : task.predecessors()) {
             if (path.contains(predTask))
                 predTasks.add(predTask);
         }
         return predTasks;
-    }
-
-    public Task getTask(String string) {
-        TaskId taskId = new TaskId(string);
-        return tasks.get(taskId);
     }
 
     private void addPredecessorsToTasksFrom(List<TaskData> taskList) throws KeyNotFoundException {

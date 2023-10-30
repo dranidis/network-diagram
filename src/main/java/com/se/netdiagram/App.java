@@ -23,7 +23,7 @@ public class App {
             System.exit(-1);
         }
         nd.forwardAndBackWard();
-        nd.print();
+        PrinterService.print(nd);
     }
 
 }
