@@ -1,4 +1,4 @@
-package com.se.netdiagram.domain.model;
+package com.se.netdiagram.domain.model.networkdiagram;
 
 import java.util.ArrayList;
 import java.util.Collection;
@@ -22,6 +22,16 @@ public class NetworkDiagram {
         return tasks.get(new TaskId(string));
     }
 
+    /**
+     * Adds a task to the network diagram.
+     * 
+     * For consistency, a forward and backward processing is triggered
+     * that updates the ES, EF, LS, LF and Slack values of all tasks.
+     * 
+     * @param id
+     * @param duration
+     * @throws DuplicateTaskKeyException
+     */
     public void addTask(String id, int duration) throws DuplicateTaskKeyException {
         TaskId taskId = new TaskId(id);
         if (tasks.containsKey(taskId)) {
@@ -29,8 +39,20 @@ public class NetworkDiagram {
         }
         Task task = new Task(taskId, duration);
         tasks.put(task.id(), task);
+
+        forwardAndBackWard();
     }
 
+    /**
+     * Adds predecessors to a task.
+     * 
+     * For consistency, a forward and backward processing is triggered
+     * that updates the ES, EF, LS, LF and Slack values of all tasks.
+     * 
+     * @param aTaskId
+     * @param predIds
+     * @throws KeyNotFoundException
+     */
     public void addPredecessorsToTask(String aTaskId, List<String> predIds) throws KeyNotFoundException {
         TaskId taskId = new TaskId(aTaskId);
         Task task = tasks.get(taskId);
@@ -43,9 +65,11 @@ public class NetworkDiagram {
             }
             task.addPredecessor(predTask);
         }
+
+        forwardAndBackWard();
     }
 
-    public void forwardAndBackWard() {
+    private void forwardAndBackWard() {
         long projectEnd = forward();
         backward(projectEnd);
     }
@@ -131,18 +155,18 @@ public class NetworkDiagram {
         }
         if (!added) {
             Path path = new Path();
-            path.add(task);
+            path.addTask(task);
             paths.add(path);
         }
     }
 
     private void appendTaskToPaths(Task task, List<Task> predTasks, Path path, List<Path> paths) {
         if (predTasks.contains(path.lastTask())) {
-            path.add(task);
+            path.addTask(task);
         } else {
             Path clonedPath = new Path(path.tasks());
             clonedPath.removeLastTask();
-            clonedPath.add(task);
+            clonedPath.addTask(task);
             paths.add(clonedPath);
         }
     }
@@ -150,7 +174,7 @@ public class NetworkDiagram {
     private List<Task> getTaskPredIsInPath(Task task, Path path) {
         List<Task> predTasks = new ArrayList<>();
         for (Task predTask : task.predecessors()) {
-            if (path.contains(predTask))
+            if (path.containsTask(predTask))
                 predTasks.add(predTask);
         }
         return predTasks;

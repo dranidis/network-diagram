@@ -1,4 +1,4 @@
-package com.se.netdiagram.domain.model;
+package com.se.netdiagram.domain.model.networkdiagram;
 
 import java.util.ArrayList;
 import java.util.Collections;
@@ -20,7 +20,7 @@ public class Path {
         return Collections.unmodifiableList(tasks);
     }
 
-    public void add(Task task) {
+    public void addTask(Task task) {
         tasks.add(task);
     }
 
@@ -28,15 +28,15 @@ public class Path {
         return tasks.size();
     }
 
-    public Task get(int i) {
+    public Task taskAt(int i) {
         return tasks.get(i);
     }
 
-    public void remove(int i) {
+    public void removeTask(int i) {
         tasks.remove(i);
     }
 
-    public boolean contains(Task predTask) {
+    public boolean containsTask(Task predTask) {
         return tasks.contains(predTask);
     }
 

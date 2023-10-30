@@ -2,9 +2,9 @@ package com.se.netdiagram.application;
 
 import java.util.List;
 
-import com.se.netdiagram.domain.model.NetworkDiagram;
 import com.se.netdiagram.domain.model.exceptions.DuplicateTaskKeyException;
 import com.se.netdiagram.domain.model.exceptions.KeyNotFoundException;
+import com.se.netdiagram.domain.model.networkdiagram.NetworkDiagram;
 
 public class DiagramNetworkReaderService {
 
@@ -22,8 +22,6 @@ public class DiagramNetworkReaderService {
             System.err.println(e.getMessage());
             System.exit(-1);
         }
-
-        nd.forwardAndBackWard();
 
         return nd;
     }

@@ -11,10 +11,10 @@ import java.util.stream.Collectors;
 
 import org.junit.Test;
 
-import com.se.netdiagram.domain.model.NetworkDiagram;
-import com.se.netdiagram.domain.model.Path;
 import com.se.netdiagram.domain.model.exceptions.DuplicateTaskKeyException;
 import com.se.netdiagram.domain.model.exceptions.KeyNotFoundException;
+import com.se.netdiagram.domain.model.networkdiagram.NetworkDiagram;
+import com.se.netdiagram.domain.model.networkdiagram.Path;
 
 public class DiagramNetworkReaderServiceTest {
 
@@ -98,8 +98,6 @@ public class DiagramNetworkReaderServiceTest {
         NetworkDiagram nd = new NetworkDiagram();
         DiagramNetworkReaderService.processTaskList(nd, taskList);
 
-        nd.forwardAndBackWard();
-
         assertEquals(0, nd.getTask("A").earliestStart().getAsLong());
         assertEquals(5, nd.getTask("A").earliestFinish().getAsLong());
     }
@@ -113,8 +111,6 @@ public class DiagramNetworkReaderServiceTest {
 
         NetworkDiagram nd = new NetworkDiagram();
         DiagramNetworkReaderService.processTaskList(nd, taskList);
-
-        nd.forwardAndBackWard();
 
         assertEquals(5, nd.getTask("B").earliestStart().getAsLong());
         assertEquals(8, nd.getTask("B").earliestFinish().getAsLong());
@@ -132,8 +128,6 @@ public class DiagramNetworkReaderServiceTest {
         NetworkDiagram nd = new NetworkDiagram();
         DiagramNetworkReaderService.processTaskList(nd, taskList);
 
-        nd.forwardAndBackWard();
-
         assertEquals(5, nd.getTask("C").earliestStart().getAsLong());
         assertEquals(7, nd.getTask("C").earliestFinish().getAsLong());
     }
@@ -145,8 +139,6 @@ public class DiagramNetworkReaderServiceTest {
 
         NetworkDiagram nd = new NetworkDiagram();
         DiagramNetworkReaderService.processTaskList(nd, taskList);
-
-        nd.forwardAndBackWard();
 
         assertEquals(0, nd.getTask("A").successors().size());
     }
@@ -161,8 +153,6 @@ public class DiagramNetworkReaderServiceTest {
 
         NetworkDiagram nd = new NetworkDiagram();
         DiagramNetworkReaderService.processTaskList(nd, taskList);
-
-        nd.forwardAndBackWard();
 
         assertTrue(nd.getTask("A").successors().stream().map(s -> s.idAsString()).collect(Collectors.toList())
                 .containsAll(Arrays.asList(new String[] { "C", "B" })));
@@ -181,7 +171,6 @@ public class DiagramNetworkReaderServiceTest {
 
         NetworkDiagram nd = new NetworkDiagram();
         DiagramNetworkReaderService.processTaskList(nd, taskList);
-        nd.forwardAndBackWard();
 
         assertEquals(5, nd.getTask("A").latestFinish().getAsLong());
         assertEquals(0, nd.getTask("A").latestStart().getAsLong());
@@ -198,7 +187,6 @@ public class DiagramNetworkReaderServiceTest {
 
         NetworkDiagram nd = new NetworkDiagram();
         DiagramNetworkReaderService.processTaskList(nd, taskList);
-        nd.forwardAndBackWard();
 
         assertEquals(8, nd.getTask("C").latestFinish().getAsLong());
         assertEquals(6, nd.getTask("C").latestStart().getAsLong());
@@ -222,7 +210,6 @@ public class DiagramNetworkReaderServiceTest {
 
         NetworkDiagram nd = new NetworkDiagram();
         DiagramNetworkReaderService.processTaskList(nd, taskList);
-        nd.forwardAndBackWard();
 
         assertEquals(0, nd.getTask("A").earliestStart().getAsLong());
         assertEquals(2, nd.getTask("B").earliestStart().getAsLong());
@@ -240,13 +227,12 @@ public class DiagramNetworkReaderServiceTest {
 
         NetworkDiagram nd = new NetworkDiagram();
         DiagramNetworkReaderService.processTaskList(nd, taskList);
-        nd.forwardAndBackWard();
 
         List<Path> paths = nd.getCriticalPaths();
 
         assertEquals(1, paths.size());
         assertEquals(1, paths.get(0).size());
-        assertEquals("A", paths.get(0).get(0).idAsString());
+        assertEquals("A", paths.get(0).taskAt(0).idAsString());
     }
 
     @Test
@@ -259,14 +245,13 @@ public class DiagramNetworkReaderServiceTest {
 
         NetworkDiagram nd = new NetworkDiagram();
         DiagramNetworkReaderService.processTaskList(nd, taskList);
-        nd.forwardAndBackWard();
 
         List<Path> paths = nd.getCriticalPaths();
 
         assertEquals(1, paths.size());
         assertEquals(2, paths.get(0).size());
-        assertEquals("A", paths.get(0).get(0).idAsString());
-        assertEquals("B", paths.get(0).get(1).idAsString());
+        assertEquals("A", paths.get(0).taskAt(0).idAsString());
+        assertEquals("B", paths.get(0).taskAt(1).idAsString());
     }
 
     @Test
@@ -278,7 +263,6 @@ public class DiagramNetworkReaderServiceTest {
 
         NetworkDiagram nd = new NetworkDiagram();
         DiagramNetworkReaderService.processTaskList(nd, taskList);
-        nd.forwardAndBackWard();
 
         List<Path> paths = nd.getCriticalPaths();
 
@@ -286,11 +270,11 @@ public class DiagramNetworkReaderServiceTest {
         assertEquals(2, paths.get(0).size());
         assertEquals(2, paths.get(1).size());
 
-        assertEquals("A", paths.get(0).get(0).idAsString());
-        assertEquals("B", paths.get(0).get(1).idAsString());
+        assertEquals("A", paths.get(0).taskAt(0).idAsString());
+        assertEquals("B", paths.get(0).taskAt(1).idAsString());
 
-        assertEquals("A", paths.get(1).get(0).idAsString());
-        assertEquals("C", paths.get(1).get(1).idAsString());
+        assertEquals("A", paths.get(1).taskAt(0).idAsString());
+        assertEquals("C", paths.get(1).taskAt(1).idAsString());
     }
 
     @Test
@@ -303,16 +287,15 @@ public class DiagramNetworkReaderServiceTest {
 
         NetworkDiagram nd = new NetworkDiagram();
         DiagramNetworkReaderService.processTaskList(nd, taskList);
-        nd.forwardAndBackWard();
 
         List<Path> paths = nd.getCriticalPaths();
 
         assertEquals(1, paths.size());
         assertEquals(3, paths.get(0).size());
 
-        assertEquals("A", paths.get(0).get(0).idAsString());
-        assertEquals("B", paths.get(0).get(1).idAsString());
-        assertEquals("C", paths.get(0).get(2).idAsString());
+        assertEquals("A", paths.get(0).taskAt(0).idAsString());
+        assertEquals("B", paths.get(0).taskAt(1).idAsString());
+        assertEquals("C", paths.get(0).taskAt(2).idAsString());
     }
 
     @Test
@@ -328,16 +311,15 @@ public class DiagramNetworkReaderServiceTest {
 
         NetworkDiagram nd = new NetworkDiagram();
         DiagramNetworkReaderService.processTaskList(nd, taskList);
-        nd.forwardAndBackWard();
 
         List<Path> paths = nd.getCriticalPaths();
 
         assertEquals(8, paths.size());
         for (int i = 0; i < 8; i++) {
             assertEquals(3, paths.get(i).size());
-            assertTrue(Arrays.asList(new String[] { "A", "B" }).contains(paths.get(i).get(0).idAsString()));
-            assertTrue(Arrays.asList(new String[] { "C", "D" }).contains(paths.get(i).get(1).idAsString()));
-            assertTrue(Arrays.asList(new String[] { "E", "F" }).contains(paths.get(i).get(2).idAsString()));
+            assertTrue(Arrays.asList(new String[] { "A", "B" }).contains(paths.get(i).taskAt(0).idAsString()));
+            assertTrue(Arrays.asList(new String[] { "C", "D" }).contains(paths.get(i).taskAt(1).idAsString()));
+            assertTrue(Arrays.asList(new String[] { "E", "F" }).contains(paths.get(i).taskAt(2).idAsString()));
         }
 
     }

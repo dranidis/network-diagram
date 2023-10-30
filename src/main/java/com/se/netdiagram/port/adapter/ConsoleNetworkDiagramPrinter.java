@@ -1,8 +1,8 @@
 package com.se.netdiagram.port.adapter;
 
 import com.se.netdiagram.application.NetworkDiagramPrinter;
-import com.se.netdiagram.domain.model.Path;
-import com.se.netdiagram.domain.model.Task;
+import com.se.netdiagram.domain.model.networkdiagram.Path;
+import com.se.netdiagram.domain.model.networkdiagram.Task;
 
 public class ConsoleNetworkDiagramPrinter implements NetworkDiagramPrinter {
 

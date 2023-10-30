@@ -1,4 +1,4 @@
-package com.se.netdiagram.domain.model;
+package com.se.netdiagram.domain.model.networkdiagram;
 
 import java.util.ArrayList;
 import java.util.Collections;
@@ -21,6 +21,14 @@ public class Task {
     protected Task(TaskId taskId, int duration) {
         this.id = taskId;
         this.duration = duration;
+        setEarliestAndLatestValuesToEmpty();
+    }
+
+    private void setEarliestAndLatestValuesToEmpty() {
+        earliestStart = OptionalLong.empty();
+        earliestFinish = OptionalLong.empty();
+        latestStart = OptionalLong.empty();
+        latestFinish = OptionalLong.empty();
     }
 
     public String toString() {
@@ -75,6 +83,8 @@ public class Task {
 
         predecessors.add(predTask);
         predTask.successors.add(this);
+
+        setEarliestAndLatestValuesToEmpty();
     }
 
     private boolean additionOfTaskCreatesACircularDepenendency(Task predTask) {

@@ -2,7 +2,7 @@ package com.se.netdiagram;
 
 import com.se.netdiagram.application.DiagramNetworkReaderService;
 import com.se.netdiagram.application.PrinterService;
-import com.se.netdiagram.domain.model.NetworkDiagram;
+import com.se.netdiagram.domain.model.networkdiagram.NetworkDiagram;
 import com.se.netdiagram.port.adapter.ConsoleNetworkDiagramPrinter;
 import com.se.netdiagram.port.adapter.JSONFileTaskDataReader;
 

@@ -1,4 +1,4 @@
-package com.se.netdiagram.domain.model;
+package com.se.netdiagram.domain.model.networkdiagram;
 
 public class TaskId {
     private String id;
