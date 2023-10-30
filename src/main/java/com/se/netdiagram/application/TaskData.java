@@ -2,7 +2,16 @@ package com.se.netdiagram.application;
 
 import java.util.List;
 
+/**
+ * DTO for JSON file
+ *
+ */
 public class TaskData {
+
+    private final String id;
+    private final int duration;
+    private final List<String> pred;
+
     public TaskData() {
         id = "";
         duration = 0;
@@ -15,7 +24,15 @@ public class TaskData {
         pred = asList;
     }
 
-    public final String id;
-    public final int duration;
-    public final List<String> pred;
+    public String getId() {
+        return id;
+    }
+
+    public int getDuration() {
+        return duration;
+    }
+
+    public List<String> getPred() {
+        return pred;
+    }
 }

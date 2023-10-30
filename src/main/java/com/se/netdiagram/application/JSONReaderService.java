@@ -2,7 +2,6 @@ package com.se.netdiagram.application;
 
 import java.util.List;
 
-import com.se.netdiagram.FileReader;
 import com.se.netdiagram.domain.model.NetworkDiagram;
 import com.se.netdiagram.domain.model.exceptions.DuplicateTaskKeyException;
 import com.se.netdiagram.domain.model.exceptions.KeyNotFoundException;
@@ -12,10 +11,10 @@ public class JSONReaderService {
     private JSONReaderService() {
     }
 
-    public static NetworkDiagram readNetworkDiagramFromJSONFile(String jsonFileName) {
+    public static NetworkDiagram readNetworkDiagramWith(TaskDataReader taskDataReader) {
         NetworkDiagram nd = new NetworkDiagram();
-        FileReader fileReader = new FileReader();
-        List<TaskData> taskJSONList = fileReader.readJsonFile(jsonFileName);
+
+        List<TaskData> taskJSONList = taskDataReader.read();
 
         try {
             processTaskList(nd, taskJSONList);
@@ -25,6 +24,7 @@ public class JSONReaderService {
         }
 
         nd.forwardAndBackWard();
+
         return nd;
     }
 
@@ -41,14 +41,14 @@ public class JSONReaderService {
 
     private static void populateTasksFrom(NetworkDiagram nd, List<TaskData> taskList) throws DuplicateTaskKeyException {
         for (TaskData taskJSON : taskList) {
-            nd.addTask(taskJSON.id, taskJSON.duration);
+            nd.addTask(taskJSON.getId(), taskJSON.getDuration());
         }
     }
 
     private static void addPredecessorsToTasksFrom(NetworkDiagram nd, List<TaskData> taskList)
             throws KeyNotFoundException {
         for (TaskData taskJSON : taskList) {
-            nd.addPredecessorsToTask(taskJSON.id, taskJSON.pred);
+            nd.addPredecessorsToTask(taskJSON.getId(), taskJSON.getPred());
         }
     }
 }

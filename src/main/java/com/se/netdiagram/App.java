@@ -3,6 +3,7 @@ package com.se.netdiagram;
 import com.se.netdiagram.application.JSONReaderService;
 import com.se.netdiagram.application.PrinterService;
 import com.se.netdiagram.domain.model.NetworkDiagram;
+import com.se.netdiagram.port.adapter.JSONFileTaskDataReader;
 
 /**
  * Reads a list of tasks from a json file, calculates ES, EF, LS, LF, Slack and
@@ -14,7 +15,8 @@ public class App {
         if (args.length > 0)
             jsonFile = args[0];
 
-        NetworkDiagram nd = JSONReaderService.readNetworkDiagramFromJSONFile(jsonFile);
+        NetworkDiagram nd = JSONReaderService.readNetworkDiagramWith(
+                new JSONFileTaskDataReader(jsonFile));
 
         PrinterService.print(nd);
     }
