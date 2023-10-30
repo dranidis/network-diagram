@@ -7,19 +7,13 @@ import java.util.List;
 import java.util.Map;
 import java.util.OptionalLong;
 
-import com.se.netdiagram.TaskData;
-import com.se.netdiagram.Util;
 import com.se.netdiagram.domain.model.exceptions.DuplicateTaskKeyException;
 import com.se.netdiagram.domain.model.exceptions.KeyNotFoundException;
+import com.se.netdiagram.domain.model.utilities.Util;
 
 public class NetworkDiagram {
     private Map<TaskId, Task> tasks = new HashMap<>();
 
-    /**
-     * Returns all tasks inside the network diagram
-     * 
-     * @return
-     */
     public Collection<Task> tasks() {
         return this.tasks.values();
     }
@@ -28,22 +22,56 @@ public class NetworkDiagram {
         return tasks.get(new TaskId(string));
     }
 
-    /**
-     * @param taskList
-     * @throws DuplicateTaskKeyException
-     * @throws KeyNotFoundException
-     */
-    public void processTaskList(List<TaskData> taskList) throws DuplicateTaskKeyException, KeyNotFoundException {
+    public void addTask(String id, int duration) throws DuplicateTaskKeyException {
+        TaskId taskId = new TaskId(id);
+        if (tasks.containsKey(taskId)) {
+            throw new DuplicateTaskKeyException("Task Id: " + taskId + " already exists!");
+        }
+        Task task = new Task(taskId, duration);
+        tasks.put(task.id(), task);
+    }
 
-        tasks = new HashMap<>();
+    public void addPredecessorsToTask(String id, List<String> predIds) throws KeyNotFoundException {
+        TaskId taskId = new TaskId(id);
+        Task task = tasks.get(taskId);
+        for (String predId : predIds) {
+            TaskId predTaskId = new TaskId(predId);
 
-        populateTasksFrom(taskList);
-        addPredecessorsToTasksFrom(taskList);
+            Task predTask = tasks.get(predTaskId);
+            if (predTask == null) {
+                throw new KeyNotFoundException("Not existing predecessor KEY: " + predId + " in Task: " + task.id());
+            }
+            task.addPredecessor(predTask);
+        }
     }
 
     public void forwardAndBackWard() {
         long projectEnd = forward();
         backward(projectEnd);
+    }
+
+    public List<Path> getCriticalPaths() {
+        List<Path> paths = new ArrayList<>();
+
+        List<Task> workingTasks = new ArrayList<>();
+
+        for (Task task : tasks.values()) {
+            if (task.slack().getAsLong() == 0)
+                workingTasks.add(task);
+        }
+
+        while (!workingTasks.isEmpty()) {
+            List<Task> tasksToRemoveFromWorking = new ArrayList<>();
+            for (Task task : workingTasks) {
+                if (!existsAtLeastOneInList(task.predecessors(), workingTasks)) {
+                    addTaskToPaths(task, paths);
+                    tasksToRemoveFromWorking.add(task);
+                }
+            }
+            workingTasks.removeAll(tasksToRemoveFromWorking);
+        }
+
+        return paths;
     }
 
     /**
@@ -82,30 +110,6 @@ public class NetworkDiagram {
             }
             notProcessedTasks.removeAll(processedTasks);
         }
-    }
-
-    public List<Path> getCriticalPaths() {
-        List<Path> paths = new ArrayList<>();
-
-        List<Task> workingTasks = new ArrayList<>();
-
-        for (Task task : tasks.values()) {
-            if (task.slack().getAsLong() == 0)
-                workingTasks.add(task);
-        }
-
-        while (!workingTasks.isEmpty()) {
-            List<Task> tasksToRemoveFromWorking = new ArrayList<>();
-            for (Task task : workingTasks) {
-                if (!existsAtLeastOneInList(task.predecessors(), workingTasks)) {
-                    addTaskToPaths(task, paths);
-                    tasksToRemoveFromWorking.add(task);
-                }
-            }
-            workingTasks.removeAll(tasksToRemoveFromWorking);
-        }
-
-        return paths;
     }
 
     private boolean existsAtLeastOneInList(List<Task> tasks, List<Task> taskList) {
@@ -150,41 +154,6 @@ public class NetworkDiagram {
                 predTasks.add(predTask);
         }
         return predTasks;
-    }
-
-    private void populateTasksFrom(List<TaskData> taskList) throws DuplicateTaskKeyException {
-        for (TaskData taskJSON : taskList) {
-            addTask(taskJSON);
-        }
-    }
-
-    private void addPredecessorsToTasksFrom(List<TaskData> taskList) throws KeyNotFoundException {
-        for (TaskData taskJSON : taskList) {
-            addPredecessorsToTask(taskJSON);
-        }
-    }
-
-    private void addPredecessorsToTask(TaskData taskJSON) throws KeyNotFoundException {
-        TaskId taskId = new TaskId(taskJSON.id);
-        Task task = tasks.get(taskId);
-        for (String predId : taskJSON.pred) {
-            TaskId predTaskId = new TaskId(predId);
-
-            Task predTask = tasks.get(predTaskId);
-            if (predTask == null) {
-                throw new KeyNotFoundException("Not existing predecessor KEY: " + predId + " in Task: " + task.id());
-            }
-            task.addPredecessor(predTask);
-        }
-    }
-
-    private void addTask(TaskData taskJSON) throws DuplicateTaskKeyException {
-        TaskId taskId = new TaskId(taskJSON.id);
-        if (tasks.containsKey(taskId)) {
-            throw new DuplicateTaskKeyException("Task Id: " + taskId + " already exists!");
-        }
-        Task task = new Task(taskId, taskJSON.duration);
-        tasks.put(task.id(), task);
     }
 
 }

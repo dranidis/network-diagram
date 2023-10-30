@@ -1,4 +1,4 @@
-package com.se.netdiagram;
+package com.se.netdiagram.application;
 
 import java.util.List;
 

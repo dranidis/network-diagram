@@ -11,6 +11,8 @@ import java.util.stream.Collectors;
 
 import org.junit.Test;
 
+import com.se.netdiagram.application.JSONReader;
+import com.se.netdiagram.application.TaskData;
 import com.se.netdiagram.domain.model.NetworkDiagram;
 import com.se.netdiagram.domain.model.Path;
 import com.se.netdiagram.domain.model.exceptions.DuplicateTaskKeyException;
@@ -20,6 +22,7 @@ import com.se.netdiagram.domain.model.exceptions.KeyNotFoundException;
  * Unit test for NetworkDiagram
  */
 public class NetworkDiagramTest {
+
     @Test(expected = DuplicateTaskKeyException.class)
     public void read_Should_throw_DuplicateTaskKeyException_WhenDuplicateKeys()
             throws DuplicateTaskKeyException, KeyNotFoundException {
@@ -29,7 +32,7 @@ public class NetworkDiagramTest {
         tasklist.add(new TaskData("A", 5, Arrays.asList(new String[] {})));
 
         NetworkDiagram nd = new NetworkDiagram();
-        nd.processTaskList(tasklist);
+        JSONReader.processTaskList(nd, tasklist);
     }
 
     @Test(expected = KeyNotFoundException.class)
@@ -40,7 +43,7 @@ public class NetworkDiagramTest {
         taskList.add(new TaskData("A", 5, Arrays.asList(new String[] {})));
         taskList.add(new TaskData("B", 3, Arrays.asList(new String[] { "C" })));
         NetworkDiagram nd = new NetworkDiagram();
-        nd.processTaskList(taskList);
+        JSONReader.processTaskList(nd, taskList);
     }
 
     @Test(expected = IllegalArgumentException.class)
@@ -50,7 +53,7 @@ public class NetworkDiagramTest {
         taskList.add(new TaskData("A", 5, Arrays.asList(new String[] { "B" })));
         taskList.add(new TaskData("B", 3, Arrays.asList(new String[] { "A" })));
         NetworkDiagram nd = new NetworkDiagram();
-        nd.processTaskList(taskList);
+        JSONReader.processTaskList(nd, taskList);
     }
 
     @Test(expected = IllegalArgumentException.class)
@@ -62,7 +65,7 @@ public class NetworkDiagramTest {
         taskList.add(new TaskData("B", 3, Arrays.asList(new String[] { "A" })));
         taskList.add(new TaskData("C", 3, Arrays.asList(new String[] { "B" })));
         NetworkDiagram nd = new NetworkDiagram();
-        nd.processTaskList(taskList);
+        JSONReader.processTaskList(nd, taskList);
     }
 
     @Test(expected = IllegalArgumentException.class)
@@ -74,7 +77,7 @@ public class NetworkDiagramTest {
         taskList.add(new TaskData("B", 3, Arrays.asList(new String[] { "A", "C" })));
         taskList.add(new TaskData("C", 3, Arrays.asList(new String[] { "B" })));
         NetworkDiagram nd = new NetworkDiagram();
-        nd.processTaskList(taskList);
+        JSONReader.processTaskList(nd, taskList);
     }
 
     @Test
@@ -85,7 +88,7 @@ public class NetworkDiagramTest {
         taskList.add(new TaskData("B", 3, Arrays.asList(new String[] { "A" })));
 
         NetworkDiagram nd = new NetworkDiagram();
-        nd.processTaskList(taskList);
+        JSONReader.processTaskList(nd, taskList);
 
         assertNotNull(nd.getTask("A"));
         assertNotNull(nd.getTask("B"));
@@ -98,7 +101,7 @@ public class NetworkDiagramTest {
         taskList.add(new TaskData("A", 5, Arrays.asList(new String[] {})));
 
         NetworkDiagram nd = new NetworkDiagram();
-        nd.processTaskList(taskList);
+        JSONReader.processTaskList(nd, taskList);
 
         nd.forwardAndBackWard();
 
@@ -114,7 +117,7 @@ public class NetworkDiagramTest {
         taskList.add(new TaskData("B", 3, Arrays.asList(new String[] { "A" })));
 
         NetworkDiagram nd = new NetworkDiagram();
-        nd.processTaskList(taskList);
+        JSONReader.processTaskList(nd, taskList);
 
         nd.forwardAndBackWard();
 
@@ -132,7 +135,7 @@ public class NetworkDiagramTest {
         taskList.add(new TaskData("C", 2, Arrays.asList(new String[] { "A", "B" })));
 
         NetworkDiagram nd = new NetworkDiagram();
-        nd.processTaskList(taskList);
+        JSONReader.processTaskList(nd, taskList);
 
         nd.forwardAndBackWard();
 
@@ -146,7 +149,7 @@ public class NetworkDiagramTest {
         taskList.add(new TaskData("A", 5, Arrays.asList(new String[] {})));
 
         NetworkDiagram nd = new NetworkDiagram();
-        nd.processTaskList(taskList);
+        JSONReader.processTaskList(nd, taskList);
 
         nd.forwardAndBackWard();
 
@@ -162,7 +165,7 @@ public class NetworkDiagramTest {
         taskList.add(new TaskData("C", 5, Arrays.asList(new String[] { "A", "B" })));
 
         NetworkDiagram nd = new NetworkDiagram();
-        nd.processTaskList(taskList);
+        JSONReader.processTaskList(nd, taskList);
 
         nd.forwardAndBackWard();
 
@@ -182,7 +185,7 @@ public class NetworkDiagramTest {
         taskList.add(new TaskData("A", 5, Arrays.asList(new String[] {})));
 
         NetworkDiagram nd = new NetworkDiagram();
-        nd.processTaskList(taskList);
+        JSONReader.processTaskList(nd, taskList);
         nd.forwardAndBackWard();
 
         assertEquals(5, nd.getTask("A").latestFinish().getAsLong());
@@ -199,7 +202,7 @@ public class NetworkDiagramTest {
         taskList.add(new TaskData("C", 2, Arrays.asList(new String[] { "A" })));
 
         NetworkDiagram nd = new NetworkDiagram();
-        nd.processTaskList(taskList);
+        JSONReader.processTaskList(nd, taskList);
         nd.forwardAndBackWard();
 
         assertEquals(8, nd.getTask("C").latestFinish().getAsLong());
@@ -223,7 +226,7 @@ public class NetworkDiagramTest {
         taskList.add(new TaskData("C", 4, Arrays.asList(new String[] { "B", "A" })));
 
         NetworkDiagram nd = new NetworkDiagram();
-        nd.processTaskList(taskList);
+        JSONReader.processTaskList(nd, taskList);
         nd.forwardAndBackWard();
 
         assertEquals(0, nd.getTask("A").earliestStart().getAsLong());
@@ -241,7 +244,7 @@ public class NetworkDiagramTest {
         taskList.add(new TaskData("A", 2, Arrays.asList(new String[] {})));
 
         NetworkDiagram nd = new NetworkDiagram();
-        nd.processTaskList(taskList);
+        JSONReader.processTaskList(nd, taskList);
         nd.forwardAndBackWard();
 
         List<Path> paths = nd.getCriticalPaths();
@@ -260,7 +263,7 @@ public class NetworkDiagramTest {
         taskList.add(new TaskData("C", 2, Arrays.asList(new String[] { "A" })));
 
         NetworkDiagram nd = new NetworkDiagram();
-        nd.processTaskList(taskList);
+        JSONReader.processTaskList(nd, taskList);
         nd.forwardAndBackWard();
 
         List<Path> paths = nd.getCriticalPaths();
@@ -279,7 +282,7 @@ public class NetworkDiagramTest {
         taskList.add(new TaskData("C", 0, Arrays.asList(new String[] { "A" })));
 
         NetworkDiagram nd = new NetworkDiagram();
-        nd.processTaskList(taskList);
+        JSONReader.processTaskList(nd, taskList);
         nd.forwardAndBackWard();
 
         List<Path> paths = nd.getCriticalPaths();
@@ -304,7 +307,7 @@ public class NetworkDiagramTest {
         taskList.add(new TaskData("C", 0, Arrays.asList(new String[] { "A", "B" })));
 
         NetworkDiagram nd = new NetworkDiagram();
-        nd.processTaskList(taskList);
+        JSONReader.processTaskList(nd, taskList);
         nd.forwardAndBackWard();
 
         List<Path> paths = nd.getCriticalPaths();
@@ -329,7 +332,7 @@ public class NetworkDiagramTest {
         taskList.add(new TaskData("F", 0, Arrays.asList(new String[] { "A", "B", "C", "D" })));
 
         NetworkDiagram nd = new NetworkDiagram();
-        nd.processTaskList(taskList);
+        JSONReader.processTaskList(nd, taskList);
         nd.forwardAndBackWard();
 
         List<Path> paths = nd.getCriticalPaths();

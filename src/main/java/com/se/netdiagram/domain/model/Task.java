@@ -5,7 +5,7 @@ import java.util.Collections;
 import java.util.List;
 import java.util.OptionalLong;
 
-import com.se.netdiagram.Util;
+import com.se.netdiagram.domain.model.utilities.Util;
 
 public class Task {
     private TaskId id;
