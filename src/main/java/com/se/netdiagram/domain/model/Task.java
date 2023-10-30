@@ -89,7 +89,7 @@ public class Task {
         return false;
     }
 
-    public void calculateEarliestValues() {
+    protected void calculateEarliestValues() {
         this.earliestStart = OptionalLong.of(0);
         for (Task predTask : this.predecessors()) {
             this.earliestStart = Util.max(this.earliestStart, predTask.earliestFinish);
@@ -97,7 +97,7 @@ public class Task {
         this.earliestFinish = OptionalLong.of(this.earliestStart.getAsLong() + this.duration());
     }
 
-    public void calculateLatestValuesAndSlack(long projectEnd) {
+    protected void calculateLatestValuesAndSlack(long projectEnd) {
         this.latestFinish = OptionalLong.of(projectEnd);
         for (Task succTask : this.successors()) {
             this.latestFinish = Util.min(this.latestFinish, succTask.latestStart);

@@ -7,9 +7,9 @@ import com.se.netdiagram.domain.model.NetworkDiagram;
 import com.se.netdiagram.domain.model.exceptions.DuplicateTaskKeyException;
 import com.se.netdiagram.domain.model.exceptions.KeyNotFoundException;
 
-public class JSONReader {
+public class JSONReaderService {
 
-    private JSONReader() {
+    private JSONReaderService() {
     }
 
     public static NetworkDiagram readNetworkDiagramFromJSONFile(String jsonFileName) {

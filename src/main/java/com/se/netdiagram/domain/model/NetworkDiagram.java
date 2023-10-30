@@ -55,7 +55,7 @@ public class NetworkDiagram {
 
         List<Task> workingTasks = new ArrayList<>();
 
-        for (Task task : tasks.values()) {
+        for (Task task : tasks()) {
             if (task.slack().getAsLong() == 0)
                 workingTasks.add(task);
         }
@@ -81,7 +81,7 @@ public class NetworkDiagram {
      */
     private long forward() {
         OptionalLong projectEnd = OptionalLong.of(0);
-        List<Task> notProcessedTasks = new ArrayList<>(tasks.values());
+        List<Task> notProcessedTasks = new ArrayList<>(tasks());
 
         while (!notProcessedTasks.isEmpty()) {
             List<Task> processedTasks = new ArrayList<>();
@@ -98,7 +98,7 @@ public class NetworkDiagram {
     }
 
     private void backward(long projectEnd) {
-        List<Task> notProcessedTasks = new ArrayList<>(tasks.values());
+        List<Task> notProcessedTasks = new ArrayList<>(tasks());
 
         while (!notProcessedTasks.isEmpty()) {
             List<Task> processedTasks = new ArrayList<>();
