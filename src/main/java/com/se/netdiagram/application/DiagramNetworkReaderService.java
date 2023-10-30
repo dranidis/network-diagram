@@ -4,6 +4,7 @@ import java.util.List;
 
 import com.se.netdiagram.domain.model.exceptions.DuplicateTaskKeyException;
 import com.se.netdiagram.domain.model.exceptions.KeyNotFoundException;
+import com.se.netdiagram.domain.model.networkdiagram.Dependency;
 import com.se.netdiagram.domain.model.networkdiagram.NetworkDiagram;
 
 public class DiagramNetworkReaderService {
@@ -42,7 +43,9 @@ public class DiagramNetworkReaderService {
     private static void addPredecessorsToTasksFrom(NetworkDiagram nd, List<TaskData> taskList)
             throws KeyNotFoundException {
         for (TaskData taskJSON : taskList) {
-            nd.addPredecessorsToTask(taskJSON.getId(), taskJSON.getPredIds());
+            for (DependencyData predJSON : taskJSON.getPredIds()) {
+                nd.addPredecessorToTask(taskJSON.getId(), predJSON.getId(), predJSON.getType());
+            }
         }
     }
 }
