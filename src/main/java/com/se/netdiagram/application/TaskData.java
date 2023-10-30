@@ -10,18 +10,16 @@ public class TaskData {
 
     private final String id;
     private final int duration;
-    private final List<String> pred;
+    private final List<String> predIds;
 
     public TaskData() {
-        id = "";
-        duration = 0;
-        pred = null;
+        this("", 0, null);
     }
 
-    public TaskData(String string, int i, List<String> asList) {
-        id = string;
-        duration = i;
-        pred = asList;
+    public TaskData(String id, int duration, List<String> predIds) {
+        this.id = id;
+        this.duration = duration;
+        this.predIds = predIds;
     }
 
     public String getId() {
@@ -32,7 +30,7 @@ public class TaskData {
         return duration;
     }
 
-    public List<String> getPred() {
-        return pred;
+    public List<String> getPredIds() {
+        return predIds;
     }
 }

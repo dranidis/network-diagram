@@ -1,7 +1,7 @@
 [
-    { "id": "A", "duration": 1, "pred": [ "C" ] },
-    { "id": "B", "duration": 2, "pred": [ "A" ] },
-    { "id": "C", "duration": 2, "pred": [ "B" ] },
-    { "id": "D", "duration": 2, "pred": [ "E" ] },
-    { "id": "E", "duration": 2, "pred": [] }
+    { "id": "A", "duration": 1, "predIds": [ "C" ] },
+    { "id": "B", "duration": 2, "predIds": [ "A" ] },
+    { "id": "C", "duration": 2, "predIds": [ "B" ] },
+    { "id": "D", "duration": 2, "predIds": [ "E" ] },
+    { "id": "E", "duration": 2, "predIds": [] }
 ]

@@ -11,17 +11,13 @@ public class DiagramNetworkReaderService {
     private DiagramNetworkReaderService() {
     }
 
-    public static NetworkDiagram readNetworkDiagramWith(TaskDataReader taskDataReader) {
+    public static NetworkDiagram readNetworkDiagramWith(TaskDataReader taskDataReader)
+            throws DuplicateTaskKeyException, KeyNotFoundException {
         NetworkDiagram nd = new NetworkDiagram();
 
         List<TaskData> taskJSONList = taskDataReader.read();
 
-        try {
-            processTaskList(nd, taskJSONList);
-        } catch (DuplicateTaskKeyException | KeyNotFoundException e) {
-            System.err.println(e.getMessage());
-            System.exit(-1);
-        }
+        processTaskList(nd, taskJSONList);
 
         return nd;
     }
@@ -46,7 +42,7 @@ public class DiagramNetworkReaderService {
     private static void addPredecessorsToTasksFrom(NetworkDiagram nd, List<TaskData> taskList)
             throws KeyNotFoundException {
         for (TaskData taskJSON : taskList) {
-            nd.addPredecessorsToTask(taskJSON.getId(), taskJSON.getPred());
+            nd.addPredecessorsToTask(taskJSON.getId(), taskJSON.getPredIds());
         }
     }
 }
