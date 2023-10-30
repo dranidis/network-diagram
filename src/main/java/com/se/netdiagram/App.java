@@ -2,6 +2,11 @@ package com.se.netdiagram;
 
 import java.util.List;
 
+import com.se.netdiagram.application.PrinterService;
+import com.se.netdiagram.domain.model.NetworkDiagram;
+import com.se.netdiagram.domain.model.exceptions.DuplicateTaskKeyException;
+import com.se.netdiagram.domain.model.exceptions.KeyNotFoundException;
+
 /**
  * Reads a list of tasks from a json file, calculates ES, EF, LS, LF, Slack and
  * finds critical paths.

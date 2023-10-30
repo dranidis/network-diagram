@@ -11,6 +11,11 @@ import java.util.stream.Collectors;
 
 import org.junit.Test;
 
+import com.se.netdiagram.domain.model.NetworkDiagram;
+import com.se.netdiagram.domain.model.Path;
+import com.se.netdiagram.domain.model.exceptions.DuplicateTaskKeyException;
+import com.se.netdiagram.domain.model.exceptions.KeyNotFoundException;
+
 /**
  * Unit test for NetworkDiagram
  */

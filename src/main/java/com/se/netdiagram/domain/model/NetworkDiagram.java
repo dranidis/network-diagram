@@ -1,4 +1,4 @@
-package com.se.netdiagram;
+package com.se.netdiagram.domain.model;
 
 import java.util.ArrayList;
 import java.util.Collection;
@@ -6,6 +6,11 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.OptionalLong;
+
+import com.se.netdiagram.TaskData;
+import com.se.netdiagram.Util;
+import com.se.netdiagram.domain.model.exceptions.DuplicateTaskKeyException;
+import com.se.netdiagram.domain.model.exceptions.KeyNotFoundException;
 
 public class NetworkDiagram {
     private Map<TaskId, Task> tasks = new HashMap<>();
@@ -125,7 +130,6 @@ public class NetworkDiagram {
             path.add(task);
             paths.add(path);
         }
-
     }
 
     private void appendTaskToPaths(Task task, List<Task> predTasks, Path path, List<Path> paths) {
@@ -148,31 +152,39 @@ public class NetworkDiagram {
         return predTasks;
     }
 
-    private void addPredecessorsToTasksFrom(List<TaskData> taskList) throws KeyNotFoundException {
-        for (TaskData taskJSON : taskList) {
-            TaskId taskId = new TaskId(taskJSON.id);
-            Task task = tasks.get(taskId);
-            for (String predId : taskJSON.pred) {
-                TaskId predTaskId = new TaskId(predId);
-
-                Task predTask = tasks.get(predTaskId);
-                if (predTask == null) {
-                    throw new KeyNotFoundException(
-                            "Not existing predecessor KEY: " + predId + " in Task: " + task.id());
-                }
-                task.addPredecessor(predTask);
-            }
-        }
-    }
-
     private void populateTasksFrom(List<TaskData> taskList) throws DuplicateTaskKeyException {
         for (TaskData taskJSON : taskList) {
-            TaskId taskId = new TaskId(taskJSON.id);
-            if (tasks.containsKey(taskId)) {
-                throw new DuplicateTaskKeyException("Task Id: " + taskId + " already exists!");
-            }
-            Task task = new Task(taskId, taskJSON.duration);
-            tasks.put(task.id(), task);
+            addTask(taskJSON);
         }
     }
+
+    private void addPredecessorsToTasksFrom(List<TaskData> taskList) throws KeyNotFoundException {
+        for (TaskData taskJSON : taskList) {
+            addPredecessorsToTask(taskJSON);
+        }
+    }
+
+    private void addPredecessorsToTask(TaskData taskJSON) throws KeyNotFoundException {
+        TaskId taskId = new TaskId(taskJSON.id);
+        Task task = tasks.get(taskId);
+        for (String predId : taskJSON.pred) {
+            TaskId predTaskId = new TaskId(predId);
+
+            Task predTask = tasks.get(predTaskId);
+            if (predTask == null) {
+                throw new KeyNotFoundException("Not existing predecessor KEY: " + predId + " in Task: " + task.id());
+            }
+            task.addPredecessor(predTask);
+        }
+    }
+
+    private void addTask(TaskData taskJSON) throws DuplicateTaskKeyException {
+        TaskId taskId = new TaskId(taskJSON.id);
+        if (tasks.containsKey(taskId)) {
+            throw new DuplicateTaskKeyException("Task Id: " + taskId + " already exists!");
+        }
+        Task task = new Task(taskId, taskJSON.duration);
+        tasks.put(task.id(), task);
+    }
+
 }

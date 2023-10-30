@@ -1,9 +1,11 @@
-package com.se.netdiagram;
+package com.se.netdiagram.domain.model;
 
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 import java.util.OptionalLong;
+
+import com.se.netdiagram.Util;
 
 public class Task {
     private TaskId id;

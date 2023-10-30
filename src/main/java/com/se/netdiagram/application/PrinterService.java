@@ -1,4 +1,8 @@
-package com.se.netdiagram;
+package com.se.netdiagram.application;
+
+import com.se.netdiagram.domain.model.NetworkDiagram;
+import com.se.netdiagram.domain.model.Path;
+import com.se.netdiagram.domain.model.Task;
 
 public class PrinterService {
 

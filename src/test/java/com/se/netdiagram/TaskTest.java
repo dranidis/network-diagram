@@ -2,6 +2,9 @@ package com.se.netdiagram;
 
 import org.junit.Test;
 
+import com.se.netdiagram.domain.model.Task;
+import com.se.netdiagram.domain.model.TaskId;
+
 public class TaskTest {
 
     @Test(expected = IllegalArgumentException.class)

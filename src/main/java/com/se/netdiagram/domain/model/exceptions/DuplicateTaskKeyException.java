@@ -1,4 +1,4 @@
-package com.se.netdiagram;
+package com.se.netdiagram.domain.model.exceptions;
 
 public class DuplicateTaskKeyException extends Exception {
     /**
