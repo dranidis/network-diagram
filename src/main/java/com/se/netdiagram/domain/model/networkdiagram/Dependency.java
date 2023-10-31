@@ -13,4 +13,8 @@ public class Dependency {
         return task;
     }
 
+    public DependencyType type() {
+        return type;
+    }
+
 }

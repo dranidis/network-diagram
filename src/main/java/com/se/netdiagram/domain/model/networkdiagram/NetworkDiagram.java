@@ -43,26 +43,10 @@ public class NetworkDiagram {
     }
 
     /**
-     * Adds predecessors to a task. For consistency, a forward and backward
+     * Adds predecessor to a task. For consistency, a forward and backward
      * processing is triggered that updates the ES, EF, LS, LF and Slack values of
      * all tasks.
      */
-    // public void addPredecessorsToTask(String aTaskId, List<String> predIds) throws KeyNotFoundException {
-    //     TaskId taskId = new TaskId(aTaskId);
-    //     Task task = tasks.get(taskId);
-    //     for (String aPredId : predIds) {
-    //         TaskId predTaskId = new TaskId(aPredId);
-
-    //         Task predTask = tasks.get(predTaskId);
-    //         if (predTask == null) {
-    //             throw new KeyNotFoundException("Not existing predecessor KEY: " + aPredId + " in Task: " + task.id());
-    //         }
-    //         task.addPredecessor(predTask);
-    //     }
-
-    //     forwardAndBackWard();
-    // }
-
     public void addPredecessorToTask(String aTaskId, String aPredId, String dependencyType)
             throws KeyNotFoundException {
         TaskId taskId = new TaskId(aTaskId);

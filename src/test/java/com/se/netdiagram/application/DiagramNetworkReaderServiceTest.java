@@ -135,6 +135,52 @@ public class DiagramNetworkReaderServiceTest {
     }
 
     @Test
+    public void earliestStart_Should_Be_Same_With_EarliestStart_of_SS_pred()
+            throws DuplicateTaskKeyException, KeyNotFoundException {
+
+        List<TaskData> taskList = new ArrayList<>();
+        taskList.add(new TaskData("A", 1, Arrays.asList(new DependencyData[] {})));
+        taskList.add(new TaskData("B", 2, Arrays.asList(new DependencyData[] { new DependencyData("A", "FS") })));
+        taskList.add(new TaskData("C", 3, Arrays.asList(new DependencyData[] { new DependencyData("B", "SS") })));
+
+        NetworkDiagram nd = new NetworkDiagram();
+        DiagramNetworkReaderService.processTaskList(nd, taskList);
+
+        assertEquals(1, nd.getTask("B").earliestStart().getAsLong());
+        assertEquals(1, nd.getTask("C").earliestStart().getAsLong());
+    }
+
+    @Test
+    public void latestFinish_with_SS_pred() throws DuplicateTaskKeyException, KeyNotFoundException {
+
+        List<TaskData> taskList = new ArrayList<>();
+        taskList.add(new TaskData("A", 1, Arrays.asList(new DependencyData[] {})));
+        taskList.add(new TaskData("B", 2, Arrays.asList(new DependencyData[] { new DependencyData("A", "FS") })));
+        taskList.add(new TaskData("C", 3, Arrays.asList(new DependencyData[] { new DependencyData("B", "SS") })));
+
+        NetworkDiagram nd = new NetworkDiagram();
+        DiagramNetworkReaderService.processTaskList(nd, taskList);
+
+        assertEquals(3, nd.getTask("B").latestFinish().getAsLong());
+        assertEquals(4, nd.getTask("C").latestFinish().getAsLong());
+    }
+
+    @Test
+    public void latestFinish_with_SS_pred2() throws DuplicateTaskKeyException, KeyNotFoundException {
+
+        List<TaskData> taskList = new ArrayList<>();
+        taskList.add(new TaskData("A", 1, Arrays.asList(new DependencyData[] {})));
+        taskList.add(new TaskData("B", 3, Arrays.asList(new DependencyData[] { new DependencyData("A", "FS") })));
+        taskList.add(new TaskData("C", 2, Arrays.asList(new DependencyData[] { new DependencyData("B", "SS") })));
+
+        NetworkDiagram nd = new NetworkDiagram();
+        DiagramNetworkReaderService.processTaskList(nd, taskList);
+
+        assertEquals(4, nd.getTask("B").latestFinish().getAsLong());
+        assertEquals(4, nd.getTask("C").latestFinish().getAsLong());
+    }
+
+    @Test
     public void successors_Should_Corectly_Link_tasks() throws DuplicateTaskKeyException, KeyNotFoundException {
         List<TaskData> taskList = new ArrayList<>();
         taskList.add(new TaskData("A", 5, Arrays.asList(new DependencyData[] {})));

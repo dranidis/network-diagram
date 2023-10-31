@@ -106,7 +106,15 @@ public class Task {
         this.earliestStart = OptionalLong.of(0);
         for (Dependency predDependency : this.predecessors()) {
             Task predTask = predDependency.task();
-            this.earliestStart = Util.max(this.earliestStart, predTask.earliestFinish);
+
+            switch (predDependency.type()) {
+            case FS:
+                this.earliestStart = Util.max(this.earliestStart, predTask.earliestFinish);
+                break;
+            case SS:
+                this.earliestStart = Util.max(this.earliestStart, predTask.earliestStart);
+                break;
+            }
         }
         this.earliestFinish = OptionalLong.of(this.earliestStart.getAsLong() + this.duration());
     }
@@ -115,6 +123,13 @@ public class Task {
         this.latestFinish = OptionalLong.of(projectEnd);
         for (Dependency succDependency : this.successors()) {
             Task succTask = succDependency.task();
+
+            switch (succDependency.type()) {
+            case FS:
+                this.latestFinish = Util.min(this.latestFinish, succTask.latestStart);
+                break;
+            }
+
             this.latestFinish = Util.min(this.latestFinish, succTask.latestStart);
         }
         this.latestStart = OptionalLong.of(this.latestFinish.getAsLong() - this.duration());
