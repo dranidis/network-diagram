@@ -1,0 +1,27 @@
+[
+    {
+        "id": "A",
+        "duration": 1,
+        "predIds": []
+    },
+    {
+        "id": "B",
+        "duration": 3,
+        "predIds": [
+            {
+                "id": "A",
+                "type": "FS"
+            }
+        ]
+    },
+    {
+        "id": "C",
+        "duration": 2,
+        "predIds": [
+            {
+                "id": "B",
+                "type": "SS"
+            }
+        ]
+    }
+]

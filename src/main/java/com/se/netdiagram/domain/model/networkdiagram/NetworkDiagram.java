@@ -81,7 +81,7 @@ public class NetworkDiagram {
         while (!workingTasks.isEmpty()) {
             List<Task> tasksToRemoveFromWorking = new ArrayList<>();
             for (Task task : workingTasks) {
-                if (!existsAtLeastOneInList(task.predecessors(), workingTasks)) {
+                if (!task.dependsOnAnyTaskFrom(workingTasks)) {
                     addTaskToPaths(task, paths);
                     tasksToRemoveFromWorking.add(task);
                 }
@@ -103,8 +103,9 @@ public class NetworkDiagram {
 
         while (!notProcessedTasks.isEmpty()) {
             List<Task> processedTasks = new ArrayList<>();
+
             for (Task task : notProcessedTasks) {
-                if (!existsAtLeastOneInList(task.predecessors(), notProcessedTasks)) {
+                if (!task.dependsOnAnyTaskFrom(notProcessedTasks)) {
                     task.calculateEarliestValues();
                     projectEnd = Util.max(projectEnd, task.earliestFinish());
                     processedTasks.add(task);
@@ -121,22 +122,14 @@ public class NetworkDiagram {
         while (!notProcessedTasks.isEmpty()) {
             List<Task> processedTasks = new ArrayList<>();
             for (Task task : notProcessedTasks) {
-                if (!existsAtLeastOneInList(task.successors(), notProcessedTasks)) {
+                if (!task.haveAnyTaskDependingOnMeFrom(notProcessedTasks)) {
                     task.calculateLatestValuesAndSlack(projectEnd);
+
                     processedTasks.add(task);
                 }
             }
             notProcessedTasks.removeAll(processedTasks);
         }
-    }
-
-    private boolean existsAtLeastOneInList(List<Dependency> dependencies, List<Task> taskList) {
-        for (Dependency dependency : dependencies) {
-            Task task = dependency.task();
-            if (taskList.contains(task))
-                return true;
-        }
-        return false;
     }
 
     private void addTaskToPaths(Task task, List<Path> paths) {

@@ -55,6 +55,33 @@ public class Task {
         return Collections.unmodifiableList(predecessors);
     }
 
+    public boolean dependsOnAnyTaskFrom(List<Task> tasks) {
+        for (Task task : tasks) {
+            if (this.dependsOn(task)) {
+                return true;
+            }
+        }
+        return false;
+    }
+
+    private boolean dependsOn(Task task) {
+        for (Dependency dependency : predecessors) {
+            if (dependency.task() == task) {
+                return true;
+            }
+        }
+        return false;
+    }
+
+    public boolean haveAnyTaskDependingOnMeFrom(List<Task> tasks) {
+        for (Task task : tasks) {
+            if (task.dependsOn(this)) {
+                return true;
+            }
+        }
+        return false;
+    }
+
     /**
      * Adds a predecessor to this task. Also adds this task as a successor to the
      * predecessor.
@@ -82,7 +109,7 @@ public class Task {
         }
 
         predecessors.add(predDependency);
-        predDependency.task().successors.add(new Dependency(this, DependencyType.FS));
+        predDependency.task().successors.add(new Dependency(this, predDependency.type()));
 
         setEarliestAndLatestValuesToEmpty();
     }
@@ -108,15 +135,23 @@ public class Task {
             Task predTask = predDependency.task();
 
             switch (predDependency.type()) {
-            case FS:
-                this.earliestStart = Util.max(this.earliestStart, predTask.earliestFinish);
-                break;
-            case SS:
-                this.earliestStart = Util.max(this.earliestStart, predTask.earliestStart);
-                break;
+                case FS:
+                    this.earliestStart = Util.max(this.earliestStart, predTask.earliestFinish);
+                    break;
+                case SS:
+                    this.earliestStart = Util.max(this.earliestStart, predTask.earliestStart);
+                    break;
+                case FF:
+                    this.earliestStart = Util.max(this.earliestStart,
+                            OptionalLong.of(predTask.earliestFinish.getAsLong() - this.duration));
+                case SF:
+                    this.earliestStart = Util.max(this.earliestStart,
+                            OptionalLong.of(predTask.earliestStart.getAsLong() - this.duration));
             }
         }
         this.earliestFinish = OptionalLong.of(this.earliestStart.getAsLong() + this.duration());
+
+        assert this.earliestStart.getAsLong() >= 0;
     }
 
     protected void calculateLatestValuesAndSlack(long projectEnd) {
@@ -125,12 +160,15 @@ public class Task {
             Task succTask = succDependency.task();
 
             switch (succDependency.type()) {
-            case FS:
-                this.latestFinish = Util.min(this.latestFinish, succTask.latestStart);
-                break;
+                case FS:
+                    this.latestFinish = Util.min(this.latestFinish, succTask.latestStart);
+                    break;
+                case SS:
+                    this.latestFinish = Util.min(this.latestFinish,
+                            OptionalLong.of(succTask.latestStart.getAsLong() +
+                                    this.duration));
             }
 
-            this.latestFinish = Util.min(this.latestFinish, succTask.latestStart);
         }
         this.latestStart = OptionalLong.of(this.latestFinish.getAsLong() - this.duration());
         this.slack = OptionalLong.of(this.latestFinish.getAsLong() - this.earliestFinish.getAsLong());
