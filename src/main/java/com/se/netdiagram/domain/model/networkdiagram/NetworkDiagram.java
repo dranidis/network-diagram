@@ -47,7 +47,7 @@ public class NetworkDiagram {
      * processing is triggered that updates the ES, EF, LS, LF and Slack values of
      * all tasks.
      */
-    public void addPredecessorToTask(String aTaskId, String aPredId, String dependencyType)
+    public void addPredecessorToTask(String aTaskId, String aPredId, String dependencyType, int lag)
             throws KeyNotFoundException {
         TaskId taskId = new TaskId(aTaskId);
         Task task = tasks.get(taskId);
@@ -58,7 +58,7 @@ public class NetworkDiagram {
             throw new KeyNotFoundException("Not existing predecessor KEY: " + aPredId + " in Task: " + task.id());
         }
 
-        task.addPredecessor(new Dependency(predTask, DependencyType.valueOf(dependencyType)));
+        task.addPredecessor(new Dependency(predTask, DependencyType.valueOf(dependencyType), lag));
 
         forwardAndBackWard();
     }

@@ -44,7 +44,7 @@ public class DiagramNetworkReaderService {
             throws KeyNotFoundException {
         for (TaskData taskJSON : taskList) {
             for (DependencyData predJSON : taskJSON.getPredIds()) {
-                nd.addPredecessorToTask(taskJSON.getId(), predJSON.getId(), predJSON.getType());
+                nd.addPredecessorToTask(taskJSON.getId(), predJSON.getId(), predJSON.getType(), predJSON.getLag());
             }
         }
     }

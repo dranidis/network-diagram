@@ -5,8 +5,6 @@ import java.util.Collections;
 import java.util.List;
 import java.util.OptionalLong;
 
-import com.se.netdiagram.domain.model.utilities.Util;
-
 public class Task {
     private TaskId id;
     private int duration;
@@ -109,7 +107,7 @@ public class Task {
         }
 
         predecessors.add(predDependency);
-        predDependency.task().successors.add(new Dependency(this, predDependency.type()));
+        predDependency.task().successors.add(new Dependency(this, predDependency.type(), predDependency.lag()));
 
         setEarliestAndLatestValuesToEmpty();
     }
@@ -134,20 +132,24 @@ public class Task {
         for (Dependency predDependency : this.predecessors()) {
             Task predTask = predDependency.task();
 
+            long es = this.earliestStart.getAsLong();
+            long pef = predTask.earliestFinish.getAsLong();
+            long pes = predTask.earliestStart.getAsLong();
+
             switch (predDependency.type()) {
-                case FS:
-                    this.earliestStart = Util.max(this.earliestStart, predTask.earliestFinish);
-                    break;
-                case SS:
-                    this.earliestStart = Util.max(this.earliestStart, predTask.earliestStart);
-                    break;
-                case FF:
-                    this.earliestStart = Util.max(this.earliestStart,
-                            OptionalLong.of(predTask.earliestFinish.getAsLong() - this.duration));
-                case SF:
-                    this.earliestStart = Util.max(this.earliestStart,
-                            OptionalLong.of(predTask.earliestStart.getAsLong() - this.duration));
+            case FS:
+                es = Math.max(es, pef + predDependency.lag());
+                break;
+            case SS:
+                es = Math.max(es, pes + predDependency.lag());
+                break;
+            case FF:
+                es = Math.max(es, pef - this.duration + predDependency.lag());
+                break;
+            case SF:
+                es = Math.max(es, pes - this.duration + predDependency.lag());
             }
+            this.earliestStart = OptionalLong.of(es);
         }
         this.earliestFinish = OptionalLong.of(this.earliestStart.getAsLong() + this.duration());
 
@@ -159,16 +161,24 @@ public class Task {
         for (Dependency succDependency : this.successors()) {
             Task succTask = succDependency.task();
 
-            switch (succDependency.type()) {
-                case FS:
-                    this.latestFinish = Util.min(this.latestFinish, succTask.latestStart);
-                    break;
-                case SS:
-                    this.latestFinish = Util.min(this.latestFinish,
-                            OptionalLong.of(succTask.latestStart.getAsLong() +
-                                    this.duration));
-            }
+            long lf = this.latestFinish.getAsLong();
+            long sls = succTask.latestStart.getAsLong();
+            long slf = succTask.latestFinish.getAsLong();
 
+            switch (succDependency.type()) {
+            case FS:
+                lf = Math.min(lf, sls - succDependency.lag());
+                break;
+            case SS:
+                lf = Math.min(lf, sls + this.duration - succDependency.lag());
+                break;
+            case FF:
+                lf = Math.min(lf, slf - succDependency.lag());
+                break;
+            case SF:
+                lf = Math.min(lf, slf + this.duration - succDependency.lag());
+            }
+            this.latestFinish = OptionalLong.of(lf);
         }
         this.latestStart = OptionalLong.of(this.latestFinish.getAsLong() - this.duration());
         this.slack = OptionalLong.of(this.latestFinish.getAsLong() - this.earliestFinish.getAsLong());

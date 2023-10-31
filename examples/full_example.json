@@ -1,0 +1,44 @@
+[
+    { "id": "A", "duration": 1, "predIds": [] },
+    { "id": "B", "duration": 2, "predIds": [] },
+    { "id": "C", "duration": 2, "predIds": [{ "id": "A", "type": "FS" }] },
+    { "id": "D", "duration": 4, "predIds": [{ "id": "A", "type": "SS" }] },
+    { "id": "E", "duration": 1, "predIds": [{ "id": "B", "type": "FS" }] },
+    {
+        "id": "F",
+        "duration": 2,
+        "predIds": [
+            { "id": "C", "type": "FS" },
+            { "id": "D", "type": "FS" }
+        ]
+    },
+    { "id": "G", "duration": 3, "predIds": [{ "id": "E", "type": "FS" }] },
+    {
+        "id": "H",
+        "duration": 1,
+        "predIds": [{ "id": "G", "type": "FS", "lag": 2 }]
+    },
+    { "id": "I", "duration": 4, "predIds": [{ "id": "G", "type": "FS" }] },
+    {
+        "id": "J",
+        "duration": 1,
+        "predIds": [{ "id": "F", "type": "FF", "lag": -1 }]
+    },
+    {
+        "id": "K",
+        "duration": 3,
+        "predIds": [
+            { "id": "H", "type": "FS" },
+            { "id": "J", "type": "SF", "lag": 1 }
+        ]
+    },
+    { "id": "L", "duration": 4, "predIds": [{ "id": "I", "type": "FS" }] },
+    {
+        "id": "M",
+        "duration": 1,
+        "predIds": [
+            { "id": "K", "type": "FS" },
+            { "id": "L", "type": "FF", "lag": 1 }
+        ]
+    }
+]

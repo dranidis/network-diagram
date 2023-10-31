@@ -1,0 +1,28 @@
+[
+    {
+        "id": "A",
+        "duration": 3,
+        "predIds": []
+    },
+    {
+        "id": "B",
+        "duration": 3,
+        "predIds": [
+            {
+                "id": "A",
+                "type": "SF",
+                "lag": "5"
+            }
+        ]
+    },
+    {
+        "id": "C",
+        "duration": 3,
+        "predIds": [
+            {
+                "id": "B",
+                "type": "FS"
+            }
+        ]
+    }
+]
