@@ -11,10 +11,10 @@ public class PrinterService {
 
     public static void printTasksAndCriticalPaths(NetworkDiagram nd, NetworkDiagramPrinter ndp) {
 
-        ndp.printHeader();
+        ndp.printHeader(nd.projectEnd());
 
         for (Task task : nd.tasks()) {
-            ndp.printTask(task);
+            ndp.printTask(task, nd.projectEnd());
         }
 
         for (Path path : nd.getCriticalPaths()) {

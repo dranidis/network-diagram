@@ -6,25 +6,37 @@ import com.se.netdiagram.domain.model.networkdiagram.Task;
 
 public class ConsoleNetworkDiagramPrinter implements NetworkDiagramPrinter {
 
-    String spacer = "  ";
-    String format = "%s %5s %4s %4s %4s %4s %4s %6s %10s";
+    public ConsoleNetworkDiagramPrinter() {
+        this(2);
+    }
+
+    public ConsoleNetworkDiagramPrinter(int scale) {
+        this.scale = scale;
+    }
+
+    private String spacer = "  ";
+    private String format = "%s %-5s %-4s %-4s %-4s %-4s %-4s %-6s %-10s";
+    private int scale;
+
+    private static final String BUSY = "█";
+    private static final String SLACK = "▒";
+    private static final String FREE = ".";
 
     @Override
-    public void printHeader() {
-        System.out.printf(format, " ", "ID", "DUR", "ES", "EF", "LS", "LF", "SLACK", "PID");
+    public void printHeader(long projectEnd) {
+        System.out.printf(format, " ", "ID", "DUR", "ES", "EF", "LS", "LF", "SLACK", "PredID");
 
         System.out.print(spacer);
 
         // print numbers for each day of duration starting from ES
-        for (int i = 0; i < 20; i++) {
-            System.out.print(i % 10);
-            System.out.print(" ");
+        for (int i = 0; i < projectEnd; i++) {
+            System.out.printf("%-" + this.scale + "s", (this.scale > 2 ? i : i % 10));
         }
         System.out.println();
     }
 
     @Override
-    public void printTask(Task task) {
+    public void printTask(Task task, long projectEnd) {
         String ANSI_RED = "\u001B[31m";
         String ANSI_RESET = "\u001B[0m";
         String criticalTask = " ";
@@ -43,18 +55,20 @@ public class ConsoleNetworkDiagramPrinter implements NetworkDiagramPrinter {
 
             System.out.print(spacer);
 
-        // print a █ character for each day of duration starting from ES
         for (int i = 0; i < task.earliestStart().getAsLong(); i++) {
-            System.out.print("  ");
+            System.out.print(scaleString(FREE));
         }
 
         for (int i = 0; i < task.duration(); i++) {
-            System.out.print("██");
+            System.out.print(scaleString(BUSY));
         }
 
-        // print a ▒ character for each day of slack
         for (int i = 0; i < task.slack().getAsLong(); i++) {
-            System.out.print("▒▒");
+            System.out.print(scaleString(SLACK));
+        }
+
+        for (int i = 0; i < projectEnd - task.latestFinish().getAsLong(); i++) {
+            System.out.print(scaleString(FREE));
         }
 
         System.out.print(ANSI_RESET);
@@ -70,6 +84,14 @@ public class ConsoleNetworkDiagramPrinter implements NetworkDiagramPrinter {
             System.out.printf("%5s ->", task.id());
         }
         System.out.println(" end");
+    }
+
+    private String scaleString(String string) {
+        String tmpString = "";
+        for (int i = 0; i < this.scale; i++) {
+            tmpString += string;
+        }
+        return tmpString;
     }
 
 }

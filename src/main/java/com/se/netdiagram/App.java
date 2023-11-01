@@ -18,18 +18,20 @@ public class App {
          * Default json file
          */
         String jsonFile = "examples/tasks.json";
+        int scale = 2;
 
         if (args.length > 0)
             jsonFile = args[0];
 
+        if (args.length > 1)
+            scale = Integer.parseInt(args[1]);
         NetworkDiagram nd;
 
         try {
 
-            nd = DiagramNetworkReaderService.readNetworkDiagramWith(
-                    new JSONFileTaskDataReader(jsonFile));
+            nd = DiagramNetworkReaderService.readNetworkDiagramWith(new JSONFileTaskDataReader(jsonFile));
 
-            PrinterService.printTasksAndCriticalPaths(nd, new ConsoleNetworkDiagramPrinter());
+            PrinterService.printTasksAndCriticalPaths(nd, new ConsoleNetworkDiagramPrinter(scale));
 
         } catch (DuplicateTaskKeyException | KeyNotFoundException e) {
             System.err.println(e.getMessage());

@@ -5,9 +5,9 @@ import com.se.netdiagram.domain.model.networkdiagram.Task;
 
 public interface NetworkDiagramPrinter {
 
-    void printHeader();
+    void printHeader(long projectEnd);
 
-    void printTask(Task task);
+    void printTask(Task task, long projectEnd);
 
     void printCriticalPath(Path path);
 

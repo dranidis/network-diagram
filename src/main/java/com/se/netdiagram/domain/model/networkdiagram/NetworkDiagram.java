@@ -13,6 +13,7 @@ import com.se.netdiagram.domain.model.utilities.Util;
 
 public class NetworkDiagram {
     private Map<TaskId, Task> tasks = new HashMap<>();
+    private long projectEnd;
 
     public Collection<Task> tasks() {
         return this.tasks.values();
@@ -20,6 +21,10 @@ public class NetworkDiagram {
 
     public Task getTask(String string) {
         return tasks.get(new TaskId(string));
+    }
+
+    public long projectEnd() {
+        return projectEnd;
     }
 
     /**
@@ -64,7 +69,7 @@ public class NetworkDiagram {
     }
 
     private void forwardAndBackWard() {
-        long projectEnd = forward();
+        projectEnd = forward();
         backward(projectEnd);
     }
 
