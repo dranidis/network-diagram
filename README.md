@@ -32,6 +32,12 @@ Provide a scale (zoom level) integer, e.g. 5.
 mvn exec:java -quiet -Dexec.mainClass="com.se.netdiagram.App" -Dexec.args="examples/tasks_all.json 5"
 ```
 
+You can also execute by using the jar with the dependencies:
+
+```
+java -jar target/net-diagram-1.0-SNAPSHOT-jar-with-dependencies.jar examples/full_example.json 5
+```
+
 Generate a coverage report (target/site/jacoco):
 
 ```
