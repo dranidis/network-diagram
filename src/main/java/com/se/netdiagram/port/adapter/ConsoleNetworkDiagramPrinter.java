@@ -32,7 +32,7 @@ public class ConsoleNetworkDiagramPrinter implements NetworkDiagramPrinter {
             criticalTask = ANSI_RED + "*";
         }
         // a string with the ids of the predecessors
-        String predString = task.predecessors().size() > 0 ? task.predecessors().get(0).toString() : "";
+        String predString = task.predecessors().isEmpty() ? task.predecessors().get(0).toString() : "";
         for (int i = 1; i < task.predecessors().size(); i++) {
             predString += ", " + task.predecessors().get(i).toString();
         }

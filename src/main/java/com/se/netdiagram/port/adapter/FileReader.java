@@ -2,6 +2,7 @@ package com.se.netdiagram.port.adapter;
 
 import java.io.File;
 import java.io.IOException;
+import java.util.ArrayList;
 import java.util.List;
 
 import com.fasterxml.jackson.core.type.TypeReference;
@@ -14,14 +15,15 @@ public class FileReader {
     public List<TaskData> readJsonFile(String fileName) {
         ObjectMapper mapper = new ObjectMapper();
         mapper.registerModule(new Jdk8Module());
-        List<TaskData> taskJSONList = null;
+        List<TaskData> taskJSONList = new ArrayList<>();
+
         try {
             taskJSONList = mapper.readValue(new File(fileName), new TypeReference<List<TaskData>>() {
             });
         } catch (IOException e) {
-            System.err.println(e.getMessage());
-            System.exit(-1);
+            e.printStackTrace();
         }
+
         return taskJSONList;
     }
 }

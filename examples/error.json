@@ -1,0 +1,4 @@
+[
+    { "id": "A", "duration": 1, "predIds": [] },
+    { "pid": "B", "duration": 2, "predIds": [] }
+]

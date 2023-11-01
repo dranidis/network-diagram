@@ -4,7 +4,6 @@ import java.util.List;
 
 import com.se.netdiagram.domain.model.exceptions.DuplicateTaskKeyException;
 import com.se.netdiagram.domain.model.exceptions.KeyNotFoundException;
-import com.se.netdiagram.domain.model.networkdiagram.Dependency;
 import com.se.netdiagram.domain.model.networkdiagram.NetworkDiagram;
 
 public class DiagramNetworkReaderService {
