@@ -1,5 +1,6 @@
 package com.se.netdiagram.application;
 
+import java.util.ArrayList;
 import java.util.List;
 
 /**
@@ -19,6 +20,10 @@ public class TaskData {
         this.id = id;
         this.duration = duration;
         this.predIds = predIds;
+    }
+
+    public TaskData(String string, int i) {
+        this(string, i, new ArrayList<>());
     }
 
     public String getId() {
