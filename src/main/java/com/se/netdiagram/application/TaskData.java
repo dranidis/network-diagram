@@ -37,4 +37,29 @@ public class TaskData {
     public List<DependencyData> getPredIds() {
         return predIds;
     }
+
+    // DSL
+    public static TaskData task(String id) {
+        return new TaskData(id, 0);
+    }
+
+    public static TaskData task(String id, int duration) {
+        return new TaskData(id, duration);
+    }
+
+    public TaskData withPred(String predId) {
+        predIds.add(new DependencyData(predId));
+        return this;
+    }
+
+    public TaskData withPred(String predId, String dependencyType) {
+        predIds.add(new DependencyData(predId, dependencyType, 0));
+        return this;
+    }
+
+    public TaskData withPred(String predId, String dependencyType, int lag) {
+        predIds.add(new DependencyData(predId, dependencyType, lag));
+        return this;
+    }
+
 }
