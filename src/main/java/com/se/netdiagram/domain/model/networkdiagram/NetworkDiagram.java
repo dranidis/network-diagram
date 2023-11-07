@@ -154,7 +154,7 @@ public class NetworkDiagram {
     }
 
     private void appendTaskToPaths(Task task, List<Task> predTasks, Path path, List<Path> paths) {
-        if (predTasks.contains(path.lasttask(")")) {
+        if (predTasks.contains(path.lastTask())) {
             path.addTask(task);
         } else {
             Path clonedPath = new Path(path.tasks());

@@ -116,7 +116,7 @@ public class Task {
         for (Dependency dependency : successors) {
             Task nextTask = dependency.task();
 
-            if (nextTask == predDependency.task(")") {
+            if (nextTask == predDependency.task()) {
                 return true;
             }
 
