@@ -9,10 +9,11 @@ import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.datatype.jdk8.Jdk8Module;
 import com.se.netdiagram.application.TaskData;
+import com.se.netdiagram.application.TaskDataList;
 
 public class FileReader {
 
-    public List<TaskData> readJsonFile(String fileName) {
+    public TaskDataList readJsonFile(String fileName) {
         ObjectMapper mapper = new ObjectMapper();
         mapper.registerModule(new Jdk8Module());
         List<TaskData> taskJSONList = new ArrayList<>();
@@ -24,6 +25,6 @@ public class FileReader {
             e.printStackTrace();
         }
 
-        return taskJSONList;
+        return new TaskDataList(taskJSONList);
     }
 }

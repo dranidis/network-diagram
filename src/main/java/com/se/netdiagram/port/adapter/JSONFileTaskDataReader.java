@@ -1,9 +1,7 @@
 package com.se.netdiagram.port.adapter;
 
-import java.util.List;
-
-import com.se.netdiagram.application.TaskData;
 import com.se.netdiagram.application.TaskDataReader;
+import com.se.netdiagram.application.TaskDataList;
 
 public class JSONFileTaskDataReader implements TaskDataReader {
 
@@ -14,7 +12,7 @@ public class JSONFileTaskDataReader implements TaskDataReader {
     }
 
     @Override
-    public List<TaskData> read() {
+    public TaskDataList read() {
         FileReader fileReader = new FileReader();
         return fileReader.readJsonFile(jsonFileName);
     }

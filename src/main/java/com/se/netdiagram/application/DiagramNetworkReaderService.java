@@ -1,7 +1,5 @@
 package com.se.netdiagram.application;
 
-import java.util.List;
-
 import com.se.netdiagram.domain.model.exceptions.DuplicateTaskKeyException;
 import com.se.netdiagram.domain.model.exceptions.KeyNotFoundException;
 import com.se.netdiagram.domain.model.networkdiagram.NetworkDiagram;
@@ -15,7 +13,7 @@ public class DiagramNetworkReaderService {
             throws DuplicateTaskKeyException, KeyNotFoundException {
         NetworkDiagram nd = new NetworkDiagram();
 
-        List<TaskData> taskJSONList = taskDataReader.read();
+        TaskDataList taskJSONList = taskDataReader.read();
 
         processTaskList(nd, taskJSONList);
 
@@ -27,21 +25,21 @@ public class DiagramNetworkReaderService {
      * @throws DuplicateTaskKeyException
      * @throws KeyNotFoundException
      */
-    protected static void processTaskList(NetworkDiagram nd, List<TaskData> taskList)
+    protected static void processTaskList(NetworkDiagram nd, TaskDataList taskList)
             throws DuplicateTaskKeyException, KeyNotFoundException {
         populateTasksFrom(nd, taskList);
         addPredecessorsToTasksFrom(nd, taskList);
     }
 
-    private static void populateTasksFrom(NetworkDiagram nd, List<TaskData> taskList) throws DuplicateTaskKeyException {
-        for (TaskData taskJSON : taskList) {
+    private static void populateTasksFrom(NetworkDiagram nd, TaskDataList taskList) throws DuplicateTaskKeyException {
+        for (TaskData taskJSON : taskList.tasks()) {
             nd.addTask(taskJSON.getId(), taskJSON.getDuration());
         }
     }
 
-    private static void addPredecessorsToTasksFrom(NetworkDiagram nd, List<TaskData> taskList)
+    private static void addPredecessorsToTasksFrom(NetworkDiagram nd, TaskDataList taskList)
             throws KeyNotFoundException {
-        for (TaskData taskJSON : taskList) {
+        for (TaskData taskJSON : taskList.tasks()) {
             for (DependencyData predJSON : taskJSON.getPredIds()) {
                 nd.addPredecessorToTask(taskJSON.getId(), predJSON.getId(), predJSON.getType(), predJSON.getLag());
             }
