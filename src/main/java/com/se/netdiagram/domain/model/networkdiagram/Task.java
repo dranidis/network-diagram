@@ -3,30 +3,17 @@ package com.se.netdiagram.domain.model.networkdiagram;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
-import java.util.OptionalLong;
 
 public class Task {
     private TaskId id;
     private Duration duration;
     private List<Dependency> predecessors = new ArrayList<>();
     private List<Dependency> successors = new ArrayList<>();
-    private OptionalLong earliestStart;
-    private OptionalLong earliestFinish;
-    private OptionalLong latestStart;
-    private OptionalLong latestFinish;
-    private OptionalLong slack;
+    private EarliestLatestValues earliestLatestValues = new EarliestLatestValues();
 
     protected Task(TaskId taskId, Duration duration) {
         this.id = taskId;
         this.duration = duration;
-        setEarliestAndLatestValuesToEmpty();
-    }
-
-    private void setEarliestAndLatestValuesToEmpty() {
-        earliestStart = OptionalLong.empty();
-        earliestFinish = OptionalLong.empty();
-        latestStart = OptionalLong.empty();
-        latestFinish = OptionalLong.empty();
     }
 
     public String toString() {
@@ -113,7 +100,7 @@ public class Task {
         predecessors.add(predDependency);
         predDependency.task().successors.add(new Dependency(this, predDependency.type(), predDependency.lag()));
 
-        setEarliestAndLatestValuesToEmpty();
+        earliestLatestValues = new EarliestLatestValues();
     }
 
     private boolean additionOfDependencyCreatesACircularDepenendency(Dependency predDependency) {
@@ -132,79 +119,15 @@ public class Task {
     }
 
     protected void calculateEarliestValues() {
-        this.earliestStart = OptionalLong.of(0);
-        for (Dependency predDependency : this.predecessors()) {
-            Task predTask = predDependency.task();
-
-            long es = this.earliestStart.getAsLong();
-            long pef = predTask.earliestFinish.getAsLong();
-            long pes = predTask.earliestStart.getAsLong();
-
-            switch (predDependency.type()) {
-            case FS:
-                es = Math.max(es, pef + predDependency.lag());
-                break;
-            case SS:
-                es = Math.max(es, pes + predDependency.lag());
-                break;
-            case FF:
-                es = Math.max(es, pef - this.duration.value() + predDependency.lag());
-                break;
-            case SF:
-                es = Math.max(es, pes - this.duration.value() + predDependency.lag());
-            }
-            this.earliestStart = OptionalLong.of(es);
-        }
-        this.earliestFinish = OptionalLong.of(this.earliestStart.getAsLong() + this.duration.value());
-
-        assert this.earliestStart.getAsLong() >= 0;
+        earliestLatestValues = earliestLatestValues.calcEarliestValues(predecessors, duration);
     }
 
     protected void calculateLatestValuesAndSlack(long projectEnd) {
-        this.latestFinish = OptionalLong.of(projectEnd);
-        for (Dependency succDependency : this.successors()) {
-            Task succTask = succDependency.task();
-
-            long lf = this.latestFinish.getAsLong();
-            long sls = succTask.latestStart.getAsLong();
-            long slf = succTask.latestFinish.getAsLong();
-
-            switch (succDependency.type()) {
-            case FS:
-                lf = Math.min(lf, sls - succDependency.lag());
-                break;
-            case SS:
-                lf = Math.min(lf, sls + this.duration.value() - succDependency.lag());
-                break;
-            case FF:
-                lf = Math.min(lf, slf - succDependency.lag());
-                break;
-            case SF:
-                lf = Math.min(lf, slf + this.duration.value() - succDependency.lag());
-            }
-            this.latestFinish = OptionalLong.of(lf);
-        }
-        this.latestStart = OptionalLong.of(this.latestFinish.getAsLong() - this.duration.value());
-        this.slack = OptionalLong.of(this.latestFinish.getAsLong() - this.earliestFinish.getAsLong());
+        earliestLatestValues = earliestLatestValues.calcLatestValuesAndSlack(successors, duration, projectEnd);
     }
 
-    public OptionalLong slack() {
-        return slack;
+    public EarliestLatestValues earliestLatestValues() {
+        return earliestLatestValues;
     }
 
-    public OptionalLong earliestFinish() {
-        return earliestFinish;
-    }
-
-    public OptionalLong earliestStart() {
-        return earliestStart;
-    }
-
-    public OptionalLong latestStart() {
-        return latestStart;
-    }
-
-    public OptionalLong latestFinish() {
-        return latestFinish;
-    }
 }

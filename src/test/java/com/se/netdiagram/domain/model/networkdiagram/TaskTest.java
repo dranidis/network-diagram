@@ -16,14 +16,14 @@ public class TaskTest {
     @Test
     public void aNewTaskShouldHaveAnEmptyES() {
         Task task = new Task(new TaskId("A"), new Duration(1));
-        assertFalse(task.earliestStart().isPresent());
+        assertFalse(task.earliestLatestValues().earliestStart().isPresent());
     }
 
     @Test
     public void whenCalculateEarliestValuesESShouldBeNonEmpty() {
         Task task = new Task(new TaskId("A"), new Duration(1));
         task.calculateEarliestValues();
-        assertTrue(task.earliestStart().isPresent());
+        assertTrue(task.earliestLatestValues().earliestStart().isPresent());
     }
 
     @Test
@@ -31,6 +31,6 @@ public class TaskTest {
         Task task = new Task(new TaskId("A"), new Duration(1));
         task.calculateEarliestValues();
         task.addPredecessor(new Dependency(new Task(new TaskId("B"), new Duration(1)), DependencyType.FS));
-        assertFalse(task.earliestStart().isPresent());
+        assertFalse(task.earliestLatestValues().earliestStart().isPresent());
     }
 }

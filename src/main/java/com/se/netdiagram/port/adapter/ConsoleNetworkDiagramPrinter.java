@@ -40,7 +40,7 @@ public class ConsoleNetworkDiagramPrinter implements NetworkDiagramPrinter {
         String ANSI_RED = "\u001B[31m";
         String ANSI_RESET = "\u001B[0m";
         String criticalTask = " ";
-        if (task.slack().getAsLong() == 0) {
+        if (task.earliestLatestValues().slack().getAsLong() == 0) {
             criticalTask = ANSI_RED + "*";
         }
         // a string with the ids of the predecessors
@@ -48,14 +48,17 @@ public class ConsoleNetworkDiagramPrinter implements NetworkDiagramPrinter {
         for (int i = 1; i < task.predecessors().size(); i++) {
             predString += ", " + task.predecessors().get(i).toString();
         }
-        System.out.printf(format, criticalTask, task.id(), task.duration(), task.earliestStart().getAsLong(),
-                task.earliestFinish().getAsLong(), task.latestStart().getAsLong(), task.latestFinish().getAsLong(),
-                task.slack().getAsLong(), predString);
+        System.out.printf(format, criticalTask, task.id(), task.duration(),
+                task.earliestLatestValues().earliestStart().getAsLong(),
+                task.earliestLatestValues().earliestFinish().getAsLong(),
+                task.earliestLatestValues().latestStart().getAsLong(),
+                task.earliestLatestValues().latestFinish().getAsLong(),
+                task.earliestLatestValues().slack().getAsLong(), predString);
         if (!criticalTask.equals(""))
 
             System.out.print(spacer);
 
-        for (int i = 0; i < task.earliestStart().getAsLong(); i++) {
+        for (int i = 0; i < task.earliestLatestValues().earliestStart().getAsLong(); i++) {
             System.out.print(scaleString(FREE));
         }
 
@@ -63,11 +66,11 @@ public class ConsoleNetworkDiagramPrinter implements NetworkDiagramPrinter {
             System.out.print(scaleString(BUSY));
         }
 
-        for (int i = 0; i < task.slack().getAsLong(); i++) {
+        for (int i = 0; i < task.earliestLatestValues().slack().getAsLong(); i++) {
             System.out.print(scaleString(SLACK));
         }
 
-        for (int i = 0; i < projectEnd - task.latestFinish().getAsLong(); i++) {
+        for (int i = 0; i < projectEnd - task.earliestLatestValues().latestFinish().getAsLong(); i++) {
             System.out.print(scaleString(FREE));
         }
 

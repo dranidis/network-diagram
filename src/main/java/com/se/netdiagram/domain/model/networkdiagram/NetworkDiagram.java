@@ -79,7 +79,7 @@ public class NetworkDiagram {
         List<Task> tasksWithZeroSlack = new ArrayList<>();
 
         for (Task task : tasks()) {
-            if (task.slack().getAsLong() == 0)
+            if (task.earliestLatestValues().slack().getAsLong() == 0)
                 tasksWithZeroSlack.add(task);
         }
 
@@ -112,7 +112,7 @@ public class NetworkDiagram {
             for (Task task : notProcessedTasks) {
                 if (!task.dependsOnAnyTaskFrom(notProcessedTasks)) {
                     task.calculateEarliestValues();
-                    projectEnd = Util.max(projectEnd, task.earliestFinish());
+                    projectEnd = Util.max(projectEnd, task.earliestLatestValues().earliestFinish());
                     processedTasks.add(task);
                 }
             }
