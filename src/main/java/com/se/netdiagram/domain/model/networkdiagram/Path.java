@@ -12,11 +12,11 @@ public class Path {
     private List<Task> tasks;
 
     public Path() {
-        this.tasks = new ArrayList<>();
+        this.tasks = Collections.unmodifiableList(new ArrayList<>());
     }
 
     public Path(List<Task> tasks) {
-        this.tasks = new ArrayList<>(tasks);
+        this.tasks = Collections.unmodifiableList(tasks);
     }
 
     public List<Task> tasks() {
@@ -24,15 +24,15 @@ public class Path {
     }
 
     public Path addTask(Task task) {
-        Path newPath = new Path(this.tasks);
-        newPath.tasks.add(task);
-        return newPath;
+        List<Task> newTasks = new ArrayList<>(this.tasks);
+        newTasks.add(task);
+        return new Path(newTasks);
     }
 
     public Path removeLastTask() {
-        Path newPath = new Path(this.tasks);
-        newPath.tasks.remove(this.tasks.size() - 1);
-        return newPath;
+        List<Task> newTasks = new ArrayList<>(this.tasks);
+        newTasks.remove(this.tasks.size() - 1);
+        return new Path(newTasks);
     }
 
     public int size() {
