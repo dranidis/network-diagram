@@ -41,7 +41,7 @@ public class NetworkDiagram {
         if (tasks.containsKey(taskId)) {
             throw new DuplicateTaskKeyException("Task Id: " + taskId + " already exists!");
         }
-        Task task = new Task(taskId, duration);
+        Task task = new Task(taskId, new Duration(duration));
         tasks.put(task.id(), task);
 
         forwardAndBackWard();

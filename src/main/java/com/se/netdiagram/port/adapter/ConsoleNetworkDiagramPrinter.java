@@ -59,7 +59,7 @@ public class ConsoleNetworkDiagramPrinter implements NetworkDiagramPrinter {
             System.out.print(scaleString(FREE));
         }
 
-        for (int i = 0; i < task.duration(); i++) {
+        for (int i = 0; i < task.durationAsInt(); i++) {
             System.out.print(scaleString(BUSY));
         }
 

@@ -7,7 +7,7 @@ import java.util.OptionalLong;
 
 public class Task {
     private TaskId id;
-    private int duration;
+    private Duration duration;
     private List<Dependency> predecessors = new ArrayList<>();
     private List<Dependency> successors = new ArrayList<>();
     private OptionalLong earliestStart;
@@ -16,7 +16,7 @@ public class Task {
     private OptionalLong latestFinish;
     private OptionalLong slack;
 
-    protected Task(TaskId taskId, int duration) {
+    protected Task(TaskId taskId, Duration duration) {
         this.id = taskId;
         this.duration = duration;
         setEarliestAndLatestValuesToEmpty();
@@ -41,8 +41,12 @@ public class Task {
         return id.toString();
     }
 
-    public int duration() {
+    public Duration duration() {
         return duration;
+    }
+
+    public int durationAsInt() {
+        return duration.value();
     }
 
     public List<Dependency> successors() {
@@ -144,14 +148,14 @@ public class Task {
                 es = Math.max(es, pes + predDependency.lag());
                 break;
             case FF:
-                es = Math.max(es, pef - this.duration + predDependency.lag());
+                es = Math.max(es, pef - this.duration.value() + predDependency.lag());
                 break;
             case SF:
-                es = Math.max(es, pes - this.duration + predDependency.lag());
+                es = Math.max(es, pes - this.duration.value() + predDependency.lag());
             }
             this.earliestStart = OptionalLong.of(es);
         }
-        this.earliestFinish = OptionalLong.of(this.earliestStart.getAsLong() + this.duration());
+        this.earliestFinish = OptionalLong.of(this.earliestStart.getAsLong() + this.duration.value());
 
         assert this.earliestStart.getAsLong() >= 0;
     }
@@ -170,17 +174,17 @@ public class Task {
                 lf = Math.min(lf, sls - succDependency.lag());
                 break;
             case SS:
-                lf = Math.min(lf, sls + this.duration - succDependency.lag());
+                lf = Math.min(lf, sls + this.duration.value() - succDependency.lag());
                 break;
             case FF:
                 lf = Math.min(lf, slf - succDependency.lag());
                 break;
             case SF:
-                lf = Math.min(lf, slf + this.duration - succDependency.lag());
+                lf = Math.min(lf, slf + this.duration.value() - succDependency.lag());
             }
             this.latestFinish = OptionalLong.of(lf);
         }
-        this.latestStart = OptionalLong.of(this.latestFinish.getAsLong() - this.duration());
+        this.latestStart = OptionalLong.of(this.latestFinish.getAsLong() - this.duration.value());
         this.slack = OptionalLong.of(this.latestFinish.getAsLong() - this.earliestFinish.getAsLong());
     }
 
