@@ -74,27 +74,27 @@ public class NetworkDiagram {
     }
 
     public List<Path> getCriticalPaths() {
-        List<Path> paths = new ArrayList<>();
+        List<Path> criticalPaths = new ArrayList<>();
 
-        List<Task> workingTasks = new ArrayList<>();
+        List<Task> tasksWithZeroSlack = new ArrayList<>();
 
         for (Task task : tasks()) {
             if (task.slack().getAsLong() == 0)
-                workingTasks.add(task);
+                tasksWithZeroSlack.add(task);
         }
 
-        while (!workingTasks.isEmpty()) {
+        while (!tasksWithZeroSlack.isEmpty()) {
             List<Task> tasksToRemoveFromWorking = new ArrayList<>();
-            for (Task task : workingTasks) {
-                if (!task.dependsOnAnyTaskFrom(workingTasks)) {
-                    addTaskToPaths(task, paths);
+            for (Task task : tasksWithZeroSlack) {
+                if (!task.dependsOnAnyTaskFrom(tasksWithZeroSlack)) {
+                    addTaskToPaths(task, criticalPaths);
                     tasksToRemoveFromWorking.add(task);
                 }
             }
-            workingTasks.removeAll(tasksToRemoveFromWorking);
+            tasksWithZeroSlack.removeAll(tasksToRemoveFromWorking);
         }
 
-        return paths;
+        return criticalPaths;
     }
 
     /**
@@ -137,30 +137,37 @@ public class NetworkDiagram {
         }
     }
 
-    private void addTaskToPaths(Task task, List<Path> paths) {
+    private void addTaskToPaths(Task task, List<Path> criticalPaths) {
         boolean added = false;
-        for (Path path : new ArrayList<>(paths)) {
-            List<Task> predTasks = getTaskPredIsInPath(task, path);
+        for (Path criticalPath : new ArrayList<>(criticalPaths)) {
+            List<Task> predTasks = getTaskPredIsInPath(task, criticalPath);
             if (!predTasks.isEmpty()) {
-                appendTaskToPaths(task, predTasks, path, paths);
+                appendTaskToPaths(task, predTasks, criticalPath, criticalPaths);
                 added = true;
             }
         }
         if (!added) {
-            Path path = new Path();
-            path.addTask(task);
-            paths.add(path);
+            criticalPaths.add(new Path().addTask(task));
         }
     }
 
+    /**
+     * If any of the task predecessors is equal to the last task of the path, it
+     * replaces in the paths the path with a new path that has the task appended to
+     * it. Otherwise, it adds a new path to the list of paths, with the last task
+     * removed and the task appended to it.
+     * 
+     * @param task
+     * @param predTasks
+     * @param path
+     * @param paths
+     */
     private void appendTaskToPaths(Task task, List<Task> predTasks, Path path, List<Path> paths) {
         if (predTasks.contains(path.lastTask())) {
-            path.addTask(task);
+            paths.remove(path);
+            paths.add(path.addTask(task));
         } else {
-            Path clonedPath = new Path(path.tasks());
-            clonedPath.removeLastTask();
-            clonedPath.addTask(task);
-            paths.add(clonedPath);
+            paths.add(path.removeLastTask().addTask(task));
         }
     }
 

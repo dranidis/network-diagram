@@ -4,6 +4,9 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 
+/**
+ * Immutable class that represents a path of tasks.
+ */
 public class Path {
 
     private List<Task> tasks;
@@ -20,8 +23,16 @@ public class Path {
         return Collections.unmodifiableList(tasks);
     }
 
-    public void addTask(Task task) {
-        tasks.add(task);
+    public Path addTask(Task task) {
+        Path newPath = new Path(this.tasks);
+        newPath.tasks.add(task);
+        return newPath;
+    }
+
+    public Path removeLastTask() {
+        Path newPath = new Path(this.tasks);
+        newPath.tasks.remove(this.tasks.size() - 1);
+        return newPath;
     }
 
     public int size() {
@@ -32,16 +43,8 @@ public class Path {
         return tasks.get(i);
     }
 
-    public void removeTask(int i) {
-        tasks.remove(i);
-    }
-
     public boolean containsTask(Task predTask) {
         return tasks.contains(predTask);
-    }
-
-    public void removeLastTask() {
-        this.tasks.remove(this.tasks.size() - 1);
     }
 
     public Task lastTask() {
