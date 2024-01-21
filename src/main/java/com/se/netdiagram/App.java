@@ -1,6 +1,7 @@
 package com.se.netdiagram;
 
 import com.se.netdiagram.application.DiagramNetworkReaderService;
+import com.se.netdiagram.application.ParsingError;
 import com.se.netdiagram.application.PrinterService;
 import com.se.netdiagram.domain.model.exceptions.DuplicateTaskKeyException;
 import com.se.netdiagram.domain.model.exceptions.KeyNotFoundException;
@@ -13,7 +14,7 @@ import com.se.netdiagram.port.adapter.JSONFileTaskDataReader;
  * finds critical paths.
  */
 public class App {
-    public static void main(String[] args) {
+    public static void main(String[] args) throws DuplicateTaskKeyException, KeyNotFoundException, ParsingError {
         /**
          * Default json file
          */
@@ -27,16 +28,9 @@ public class App {
             scale = Integer.parseInt(args[1]);
         NetworkDiagram nd;
 
-        try {
+        nd = DiagramNetworkReaderService.readNetworkDiagramWith(new JSONFileTaskDataReader(jsonFile));
 
-            nd = DiagramNetworkReaderService.readNetworkDiagramWith(new JSONFileTaskDataReader(jsonFile));
-
-            PrinterService.printTasksAndCriticalPaths(nd, new ConsoleNetworkDiagramPrinter(scale));
-
-        } catch (DuplicateTaskKeyException | KeyNotFoundException e) {
-            System.err.println(e.getMessage());
-            System.exit(-1);
-        }
+        PrinterService.printTasksAndCriticalPaths(nd, new ConsoleNetworkDiagramPrinter(scale));
 
     }
 

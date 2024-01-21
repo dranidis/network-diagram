@@ -1,6 +1,7 @@
 package com.se.netdiagram.port.adapter;
 
 import com.se.netdiagram.application.TaskDataReader;
+import com.se.netdiagram.application.ParsingError;
 import com.se.netdiagram.application.TaskDataList;
 
 public class JSONFileTaskDataReader implements TaskDataReader {
@@ -12,7 +13,7 @@ public class JSONFileTaskDataReader implements TaskDataReader {
     }
 
     @Override
-    public TaskDataList read() {
+    public TaskDataList read() throws ParsingError {
         FileReader fileReader = new FileReader();
         return fileReader.readJsonFile(jsonFileName);
     }

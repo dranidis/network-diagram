@@ -1,6 +1,13 @@
 package com.se.netdiagram;
 
 import static org.junit.Assert.assertTrue;
+import static org.junit.Assert.fail;
+
+import java.io.IOException;
+import java.nio.file.Files;
+import java.nio.file.Paths;
+import java.util.List;
+import java.util.stream.Collectors;
 
 import org.junit.Test;
 
@@ -17,18 +24,66 @@ public class AppTest {
 
         String[] args = new String[1];
 
-        args[0] = "examples/tasks_FF.json";
-        App.main(args);
+        try {
+            List<String> jsonFiles = Files.walk(Paths.get("examples"))
+                    .filter(Files::isRegularFile)
+                    .map(path -> path.toString())
+                    .filter(name -> name.endsWith(".json"))
+                    .collect(Collectors.toList());
 
-        args[0] = "examples/tasks_SF.json";
-        App.main(args);
+            for (String jsonFile : jsonFiles) {
+                System.out.println("Processing file: " + jsonFile);
 
-        args[0] = "examples/tasks_SS.json";
-        App.main(args);
+                try {
+                    args[0] = jsonFile;
+                    App.main(args);
+                } catch (Exception e) {
+                    System.err.println("While processing file" + args[0] + " an error occurred.");
+                    System.err.println(e.getMessage());
+                    // e.printStackTrace();
+                    fail("An exception occurred while processing file: " + args[0] + ".");
+                }
+            }
 
-        args[0] = "examples/full_example.json";
-        App.main(args);
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
 
         assertTrue("Smoke test passed.", true);
     }
+
+    @Test
+    public void testAppOnErrors() {
+
+        String[] args = new String[1];
+
+        try {
+            List<String> jsonFiles = Files.walk(Paths.get("example_errors"))
+                    .filter(Files::isRegularFile)
+                    .map(path -> path.toString())
+                    .filter(name -> name.endsWith(".json"))
+                    .collect(Collectors.toList());
+
+            for (String jsonFile : jsonFiles) {
+                System.out.println("Processing file: " + jsonFile);
+
+                try {
+                    args[0] = jsonFile;
+                    App.main(args);
+
+                    fail("An exception should have occurred while processing file: " + args[0] + ".");
+                } catch (Exception e) {
+                    System.err.println("While processing file" + args[0] + " an error occurred.");
+                    System.err.println(e.getMessage());
+                    // e.printStackTrace();
+                }
+            }
+
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+
+        assertTrue("Smoke test on errors passed.", true);
+    }
+
 }

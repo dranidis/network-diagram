@@ -10,7 +10,7 @@ public class DiagramNetworkReaderService {
     }
 
     public static NetworkDiagram readNetworkDiagramWith(TaskDataReader taskDataReader)
-            throws DuplicateTaskKeyException, KeyNotFoundException {
+            throws DuplicateTaskKeyException, KeyNotFoundException, ParsingError {
         NetworkDiagram nd = new NetworkDiagram();
 
         TaskDataList taskJSONList = taskDataReader.read();

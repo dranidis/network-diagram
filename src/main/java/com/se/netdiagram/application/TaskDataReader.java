@@ -2,6 +2,6 @@ package com.se.netdiagram.application;
 
 public interface TaskDataReader {
 
-    TaskDataList read();
+    TaskDataList read() throws ParsingError;
 
 }
