@@ -14,12 +14,12 @@ public class Duration {
         return value;
     }
 
-    public static Duration ofDays(int days) {
-        return new Duration(days);
-    }
+    // public static Duration ofDays(int days) {
+    //     return new Duration(days);
+    // }
 
-    public static Duration ofWeeks(int weeks) {
-        return new Duration(weeks * 7);
-    }
+    // public static Duration ofWeeks(int weeks) {
+    //     return new Duration(weeks * 7);
+    // }
 
 }

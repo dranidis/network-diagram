@@ -48,7 +48,7 @@ public class ConsoleNetworkDiagramPrinter implements NetworkDiagramPrinter {
         for (int i = 1; i < task.predecessors().size(); i++) {
             predString += ", " + task.predecessors().get(i).toString();
         }
-        System.out.printf(format, criticalTask, task.id(), task.duration(),
+        System.out.printf(format, criticalTask, task.id(), task.durationAsInt(),
                 task.earliestLatestValues().earliestStart().getAsLong(),
                 task.earliestLatestValues().earliestFinish().getAsLong(),
                 task.earliestLatestValues().latestStart().getAsLong(),

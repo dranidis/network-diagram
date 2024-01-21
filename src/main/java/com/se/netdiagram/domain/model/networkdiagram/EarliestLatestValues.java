@@ -1,6 +1,7 @@
 package com.se.netdiagram.domain.model.networkdiagram;
 
 import java.util.List;
+import java.util.NoSuchElementException;
 import java.util.OptionalLong;
 
 public class EarliestLatestValues {
@@ -14,7 +15,7 @@ public class EarliestLatestValues {
         setEarliestAndLatestValuesToEmpty();
     }
 
-    private EarliestLatestValues(EarliestLatestValues earliestLatestValues) {
+    public EarliestLatestValues(EarliestLatestValues earliestLatestValues) {
         this.earliestStart = earliestLatestValues.earliestStart;
         this.earliestFinish = earliestLatestValues.earliestFinish;
         this.latestStart = earliestLatestValues.latestStart;
@@ -79,31 +80,35 @@ public class EarliestLatestValues {
     }
 
     private void calculateLatestValuesAndSlack(List<Dependency> successors, Duration duration, long projectEnd) {
-        this.latestFinish = OptionalLong.of(projectEnd);
-        for (Dependency successorDependency : successors) {
-            Task successorTask = successorDependency.task();
+        try {
+            this.latestFinish = OptionalLong.of(projectEnd);
+            for (Dependency successorDependency : successors) {
+                Task successorTask = successorDependency.task();
 
-            long lf = this.latestFinish.getAsLong();
-            long sls = successorTask.earliestLatestValues().latestStart.getAsLong();
-            long slf = successorTask.earliestLatestValues().latestFinish.getAsLong();
+                long lf = this.latestFinish.getAsLong();
+                long sls = successorTask.earliestLatestValues().latestStart.getAsLong();
+                long slf = successorTask.earliestLatestValues().latestFinish.getAsLong();
 
-            switch (successorDependency.type()) {
-            case FS:
-                lf = Math.min(lf, sls - successorDependency.lag());
-                break;
-            case SS:
-                lf = Math.min(lf, sls + duration.value() - successorDependency.lag());
-                break;
-            case FF:
-                lf = Math.min(lf, slf - successorDependency.lag());
-                break;
-            case SF:
-                lf = Math.min(lf, slf + duration.value() - successorDependency.lag());
+                switch (successorDependency.type()) {
+                case FS:
+                    lf = Math.min(lf, sls - successorDependency.lag());
+                    break;
+                case SS:
+                    lf = Math.min(lf, sls + duration.value() - successorDependency.lag());
+                    break;
+                case FF:
+                    lf = Math.min(lf, slf - successorDependency.lag());
+                    break;
+                case SF:
+                    lf = Math.min(lf, slf + duration.value() - successorDependency.lag());
+                }
+                this.latestFinish = OptionalLong.of(lf);
             }
-            this.latestFinish = OptionalLong.of(lf);
+            this.latestStart = OptionalLong.of(this.latestFinish.getAsLong() - duration.value());
+            this.slack = OptionalLong.of(this.latestFinish.getAsLong() - this.earliestFinish.getAsLong());
+        } catch (NoSuchElementException e) {
+            throw new IllegalStateException("Earliest Values have not been calculated yet!" + e.getMessage());
         }
-        this.latestStart = OptionalLong.of(this.latestFinish.getAsLong() - duration.value());
-        this.slack = OptionalLong.of(this.latestFinish.getAsLong() - this.earliestFinish.getAsLong());
     }
 
     public EarliestLatestValues calcEarliestValues(List<Dependency> predecessors, Duration duration) {

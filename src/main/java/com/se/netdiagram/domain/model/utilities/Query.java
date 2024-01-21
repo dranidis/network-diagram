@@ -6,6 +6,10 @@ import java.util.function.Function;
 import java.util.function.Predicate;
 
 public class Query {
+
+    private Query() {
+    }
+
     public static <T> List<T> filter(List<T> list, Predicate<T> predicate) {
         List<T> result = new ArrayList<>();
         for (T element : list) {
