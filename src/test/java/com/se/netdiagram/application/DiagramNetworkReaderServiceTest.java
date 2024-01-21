@@ -24,12 +24,12 @@ public class DiagramNetworkReaderServiceTest {
     public void read_Should_throw_DuplicateTaskKeyException_WhenDuplicateKeys()
             throws DuplicateTaskKeyException, KeyNotFoundException {
 
-        TaskDataList tasklist = taskList()
+        TaskDataList taskList = taskList()
                 .add(task("A", 5))
                 .add(task("A", 3));
 
         NetworkDiagram nd = new NetworkDiagram();
-        DiagramNetworkReaderService.processTaskList(nd, tasklist);
+        DiagramNetworkReaderService.processTaskList(nd, taskList);
     }
 
     @Test(expected = KeyNotFoundException.class)
@@ -72,13 +72,13 @@ public class DiagramNetworkReaderServiceTest {
     public void read_Should_throw_CircularDependencyException_WhenThereIsATransitiveCircularDependency1()
             throws DuplicateTaskKeyException, KeyNotFoundException {
 
-        TaskDataList tasklist = taskList()
+        TaskDataList taskList = taskList()
                 .add(task("A", 5))
                 .add(task("B", 3).withPred("A").withPred("C"))
                 .add(task("C", 3).withPred("B"));
 
         NetworkDiagram nd = new NetworkDiagram();
-        DiagramNetworkReaderService.processTaskList(nd, tasklist);
+        DiagramNetworkReaderService.processTaskList(nd, taskList);
     }
 
     @Test
@@ -109,7 +109,7 @@ public class DiagramNetworkReaderServiceTest {
     }
 
     @Test
-    public void earliestStart_Should_Be_EarliestFinishOfPred_When_ThereisOnePredecessor()
+    public void earliestStart_Should_Be_EarliestFinishOfPred_When_ThereIsOnePredecessor()
             throws DuplicateTaskKeyException, KeyNotFoundException {
         TaskDataList taskList = taskList()
                 .add(task("A", 5))
@@ -123,16 +123,16 @@ public class DiagramNetworkReaderServiceTest {
     }
 
     @Test
-    public void earliestStart_Should_Be_MaxOfEarliestFinishOfPreds_When_ThereAreMorePredecessors()
+    public void earliestStart_Should_Be_MaxOfEarliestFinishOfPredecessors_When_ThereAreMorePredecessors()
             throws DuplicateTaskKeyException, KeyNotFoundException {
 
-        TaskDataList tasklist = taskList()
+        TaskDataList taskList = taskList()
                 .add(task("A", 5))
                 .add(task("B", 3))
                 .add(task("C", 2).withPred("A").withPred("B"));
 
         NetworkDiagram nd = new NetworkDiagram();
-        DiagramNetworkReaderService.processTaskList(nd, tasklist);
+        DiagramNetworkReaderService.processTaskList(nd, taskList);
 
         assertEquals(5, nd.getTask("C").earliestLatestValues().earliestStart().getAsLong());
         assertEquals(7, nd.getTask("C").earliestLatestValues().earliestFinish().getAsLong());
@@ -142,13 +142,13 @@ public class DiagramNetworkReaderServiceTest {
     public void earliestStart_Should_Be_Same_With_EarliestStart_of_SS_pred()
             throws DuplicateTaskKeyException, KeyNotFoundException {
 
-        TaskDataList tasklist = taskList()
+        TaskDataList taskList = taskList()
                 .add(task("A", 1))
                 .add(task("B", 2).withPred("A"))
                 .add(task("C", 3).withPred("B", "SS"));
 
         NetworkDiagram nd = new NetworkDiagram();
-        DiagramNetworkReaderService.processTaskList(nd, tasklist);
+        DiagramNetworkReaderService.processTaskList(nd, taskList);
 
         assertEquals(1, nd.getTask("B").earliestLatestValues().earliestStart().getAsLong());
         assertEquals(1, nd.getTask("C").earliestLatestValues().earliestStart().getAsLong());
@@ -157,13 +157,13 @@ public class DiagramNetworkReaderServiceTest {
     @Test
     public void latestFinish_with_SS_pred() throws DuplicateTaskKeyException, KeyNotFoundException {
 
-        TaskDataList tasklist = taskList()
+        TaskDataList taskList = taskList()
                 .add(task("A", 1))
                 .add(task("B", 2).withPred("A"))
                 .add(task("C", 3).withPred("B", "SS"));
 
         NetworkDiagram nd = new NetworkDiagram();
-        DiagramNetworkReaderService.processTaskList(nd, tasklist);
+        DiagramNetworkReaderService.processTaskList(nd, taskList);
 
         assertEquals(3, nd.getTask("B").earliestLatestValues().latestFinish().getAsLong());
         assertEquals(4, nd.getTask("C").earliestLatestValues().latestFinish().getAsLong());
@@ -172,29 +172,29 @@ public class DiagramNetworkReaderServiceTest {
     @Test
     public void latestFinish_with_SS_pred2() throws DuplicateTaskKeyException, KeyNotFoundException {
 
-        TaskDataList tasklist = taskList()
+        TaskDataList taskList = taskList()
                 .add(task("A", 1))
                 .add(task("B", 3).withPred("A"))
                 .add(task("C", 2).withPred("B", "SS"));
 
         NetworkDiagram nd = new NetworkDiagram();
-        DiagramNetworkReaderService.processTaskList(nd, tasklist);
+        DiagramNetworkReaderService.processTaskList(nd, taskList);
 
         assertEquals(4, nd.getTask("B").earliestLatestValues().latestFinish().getAsLong());
         assertEquals(4, nd.getTask("C").earliestLatestValues().latestFinish().getAsLong());
     }
 
     @Test
-    public void earlistFinish_Should_Be_Same_earliestFinish_of_FF_pred()
+    public void earliestFinish_Should_Be_Same_earliestFinish_of_FF_pred()
             throws DuplicateTaskKeyException, KeyNotFoundException {
 
-        TaskDataList tasklist = taskList()
+        TaskDataList taskList = taskList()
                 .add(task("A", 1))
                 .add(task("B", 3).withPred("A"))
                 .add(task("C", 2).withPred("B", "FF"));
 
         NetworkDiagram nd = new NetworkDiagram();
-        DiagramNetworkReaderService.processTaskList(nd, tasklist);
+        DiagramNetworkReaderService.processTaskList(nd, taskList);
 
         assertEquals(4, nd.getTask("B").earliestLatestValues().earliestFinish().getAsLong());
         assertEquals(4, nd.getTask("C").earliestLatestValues().earliestFinish().getAsLong());
@@ -203,13 +203,13 @@ public class DiagramNetworkReaderServiceTest {
     @Test
     public void latestStart_with_FF_pred() throws DuplicateTaskKeyException, KeyNotFoundException {
 
-        TaskDataList tasklist = taskList()
+        TaskDataList taskList = taskList()
                 .add(task("A", 1))
                 .add(task("B", 1).withPred("A"))
                 .add(task("C", 3).withPred("B", "FF"));
 
         NetworkDiagram nd = new NetworkDiagram();
-        DiagramNetworkReaderService.processTaskList(nd, tasklist);
+        DiagramNetworkReaderService.processTaskList(nd, taskList);
 
         assertEquals(1, nd.getTask("B").earliestLatestValues().earliestStart().getAsLong());
         assertEquals(2, nd.getTask("B").earliestLatestValues().latestStart().getAsLong());
@@ -263,13 +263,13 @@ public class DiagramNetworkReaderServiceTest {
     @Test
     public void SF_pred() throws DuplicateTaskKeyException, KeyNotFoundException {
 
-        TaskDataList tasklist = taskList()
+        TaskDataList taskList = taskList()
                 .add(task("A", 3))
                 .add(task("B", 4).withPred("A"))
                 .add(task("C", 2).withPred("B", "SF"));
 
         NetworkDiagram nd = new NetworkDiagram();
-        DiagramNetworkReaderService.processTaskList(nd, tasklist);
+        DiagramNetworkReaderService.processTaskList(nd, taskList);
 
         assertEquals(1, nd.getTask("C").earliestLatestValues().earliestStart().getAsLong());
         assertEquals(3, nd.getTask("C").earliestLatestValues().earliestFinish().getAsLong());
@@ -278,7 +278,7 @@ public class DiagramNetworkReaderServiceTest {
     }
 
     @Test
-    public void successors_Should_Corectly_Link_tasks() throws DuplicateTaskKeyException, KeyNotFoundException {
+    public void successors_Should_Correctly_Link_tasks() throws DuplicateTaskKeyException, KeyNotFoundException {
         TaskDataList taskList = taskList()
                 .add(task("A", 5));
 
@@ -289,15 +289,15 @@ public class DiagramNetworkReaderServiceTest {
     }
 
     @Test
-    public void successors_Should_Corectly_Link_tasksBackWards()
+    public void successors_Should_Correctly_Link_tasksBackWards()
             throws DuplicateTaskKeyException, KeyNotFoundException {
-        TaskDataList tasklist = taskList()
+        TaskDataList taskList = taskList()
                 .add(task("A", 5))
                 .add(task("B", 5).withPred("A"))
                 .add(task("C", 5).withPred("A").withPred("B"));
 
         NetworkDiagram nd = new NetworkDiagram();
-        DiagramNetworkReaderService.processTaskList(nd, tasklist);
+        DiagramNetworkReaderService.processTaskList(nd, taskList);
 
         assertTrue(nd.getTask("A").successors().stream().map(s -> s.task().idAsString()).collect(Collectors.toList())
                 .containsAll(Arrays.asList(new String[] { "C", "B" })));
@@ -325,13 +325,13 @@ public class DiagramNetworkReaderServiceTest {
     @Test
     public void latestFinish_Should_Be_min_of_latestStart_When_ThereAreSuccessors()
             throws DuplicateTaskKeyException, KeyNotFoundException {
-        TaskDataList tasklist = taskList()
+        TaskDataList taskList = taskList()
                 .add(task("A", 5))
                 .add(task("B", 3).withPred("A"))
                 .add(task("C", 2).withPred("A"));
 
         NetworkDiagram nd = new NetworkDiagram();
-        DiagramNetworkReaderService.processTaskList(nd, tasklist);
+        DiagramNetworkReaderService.processTaskList(nd, taskList);
 
         assertEquals(8, nd.getTask("C").earliestLatestValues().latestFinish().getAsLong());
         assertEquals(6, nd.getTask("C").earliestLatestValues().latestStart().getAsLong());
@@ -350,13 +350,13 @@ public class DiagramNetworkReaderServiceTest {
     @Test
     public void FS_with_lag() throws DuplicateTaskKeyException, KeyNotFoundException {
 
-        TaskDataList tasklist = taskList()
+        TaskDataList taskList = taskList()
                 .add(task("A", 3))
                 .add(task("B", 4).withPred("A", "FS", 0))
                 .add(task("C", 3).withPred("B", "FS", 2));
 
         NetworkDiagram nd = new NetworkDiagram();
-        DiagramNetworkReaderService.processTaskList(nd, tasklist);
+        DiagramNetworkReaderService.processTaskList(nd, taskList);
 
         assertEquals(3, nd.getTask("B").earliestLatestValues().earliestStart().getAsLong());
         assertEquals(7, nd.getTask("B").earliestLatestValues().earliestFinish().getAsLong());
@@ -372,14 +372,14 @@ public class DiagramNetworkReaderServiceTest {
     // https://www.youtube.com/watch?v=lMWi96SjZ1Y
     @Test
     public void SS_with_lag() throws DuplicateTaskKeyException, KeyNotFoundException {
-        TaskDataList tasklist = taskList()
+        TaskDataList taskList = taskList()
                 .add(task("A", 2))
                 .add(task("B", 3).withPred("A", "SS"))
                 .add(task("C", 4).withPred("B"))
                 .add(task("D", 3).withPred("C", "SS", 2));
 
         NetworkDiagram nd = new NetworkDiagram();
-        DiagramNetworkReaderService.processTaskList(nd, tasklist);
+        DiagramNetworkReaderService.processTaskList(nd, taskList);
 
         assertEquals(7, nd.getTask("C").earliestLatestValues().latestFinish().getAsLong());
         assertEquals(3, nd.getTask("C").earliestLatestValues().latestStart().getAsLong());
@@ -389,14 +389,14 @@ public class DiagramNetworkReaderServiceTest {
     // https://www.youtube.com/watch?v=AGYdLUaZvDk
     @Test
     public void FF_with_lag() throws DuplicateTaskKeyException, KeyNotFoundException {
-        TaskDataList tasklist = taskList()
+        TaskDataList taskList = taskList()
                 .add(task("A", 3))
                 .add(task("B", 2).withPred("A", "FF"))
                 .add(task("C", 3).withPred("B", "FF", 2))
                 .add(task("D", 3).withPred("C"));
 
         NetworkDiagram nd = new NetworkDiagram();
-        DiagramNetworkReaderService.processTaskList(nd, tasklist);
+        DiagramNetworkReaderService.processTaskList(nd, taskList);
 
         assertEquals(3, nd.getTask("B").earliestLatestValues().latestFinish().getAsLong());
         assertEquals(1, nd.getTask("B").earliestLatestValues().latestStart().getAsLong());
@@ -406,13 +406,13 @@ public class DiagramNetworkReaderServiceTest {
     // https://www.youtube.com/watch?v=Ex_wD26Ixbc
     @Test
     public void SF_with_lag() throws DuplicateTaskKeyException, KeyNotFoundException {
-        TaskDataList tasklist = taskList()
+        TaskDataList taskList = taskList()
                 .add(task("A", 3))
                 .add(task("B", 3).withPred("A", "SF", 5))
                 .add(task("C", 4).withPred("B"));
 
         NetworkDiagram nd = new NetworkDiagram();
-        DiagramNetworkReaderService.processTaskList(nd, tasklist);
+        DiagramNetworkReaderService.processTaskList(nd, taskList);
 
         assertEquals(2, nd.getTask("B").earliestLatestValues().earliestStart().getAsLong());
         assertEquals(5, nd.getTask("B").earliestLatestValues().earliestFinish().getAsLong());
@@ -426,13 +426,13 @@ public class DiagramNetworkReaderServiceTest {
 
     @Test
     public void process_Should_WorkWithTransitiveDependencies() throws DuplicateTaskKeyException, KeyNotFoundException {
-        TaskDataList tasklist = taskList()
+        TaskDataList taskList = taskList()
                 .add(task("A", 2))
                 .add(task("B", 3).withPred("A"))
                 .add(task("C", 4).withPred("B").withPred("A"));
 
         NetworkDiagram nd = new NetworkDiagram();
-        DiagramNetworkReaderService.processTaskList(nd, tasklist);
+        DiagramNetworkReaderService.processTaskList(nd, taskList);
 
         assertEquals(0, nd.getTask("A").earliestLatestValues().earliestStart().getAsLong());
         assertEquals(2, nd.getTask("B").earliestLatestValues().earliestStart().getAsLong());
@@ -461,13 +461,13 @@ public class DiagramNetworkReaderServiceTest {
     @Test
     public void criticalPath_Should_Be_OnlyTasksWithSlackZero() throws DuplicateTaskKeyException, KeyNotFoundException {
 
-        TaskDataList tasklist = taskList()
+        TaskDataList taskList = taskList()
                 .add(task("A", 2))
                 .add(task("B", 3).withPred("A"))
                 .add(task("C", 2).withPred("A"));
 
         NetworkDiagram nd = new NetworkDiagram();
-        DiagramNetworkReaderService.processTaskList(nd, tasklist);
+        DiagramNetworkReaderService.processTaskList(nd, taskList);
 
         List<Path> paths = nd.getCriticalPaths();
 
@@ -503,13 +503,13 @@ public class DiagramNetworkReaderServiceTest {
     @Test
     public void criticalPath_Should_WorkWithTransitiveDependencies()
             throws DuplicateTaskKeyException, KeyNotFoundException {
-        TaskDataList tasklist = taskList()
+        TaskDataList taskList = taskList()
                 .add(task("A"))
                 .add(task("B").withPred("A"))
                 .add(task("C").withPred("A").withPred("B"));
 
         NetworkDiagram nd = new NetworkDiagram();
-        DiagramNetworkReaderService.processTaskList(nd, tasklist);
+        DiagramNetworkReaderService.processTaskList(nd, taskList);
 
         List<Path> paths = nd.getCriticalPaths();
 
@@ -524,7 +524,7 @@ public class DiagramNetworkReaderServiceTest {
     @Test
     public void criticalPath_Should_WorkWithTransitiveDependenciesMoreThanOnePath()
             throws DuplicateTaskKeyException, KeyNotFoundException {
-        TaskDataList tasklist = taskList()
+        TaskDataList taskList = taskList()
                 .add(task("A"))
                 .add(task("B"))
                 .add(task("C").withPred("A").withPred("B"))
@@ -541,7 +541,7 @@ public class DiagramNetworkReaderServiceTest {
                         .withPred("D", "FS"));
 
         NetworkDiagram nd = new NetworkDiagram();
-        DiagramNetworkReaderService.processTaskList(nd, tasklist);
+        DiagramNetworkReaderService.processTaskList(nd, taskList);
 
         List<Path> paths = nd.getCriticalPaths();
 

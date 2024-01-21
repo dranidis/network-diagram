@@ -80,25 +80,25 @@ public class EarliestLatestValues {
 
     private void calculateLatestValuesAndSlack(List<Dependency> successors, Duration duration, long projectEnd) {
         this.latestFinish = OptionalLong.of(projectEnd);
-        for (Dependency succDependency : successors) {
-            Task succTask = succDependency.task();
+        for (Dependency successorDependency : successors) {
+            Task successorTask = successorDependency.task();
 
             long lf = this.latestFinish.getAsLong();
-            long sls = succTask.earliestLatestValues().latestStart.getAsLong();
-            long slf = succTask.earliestLatestValues().latestFinish.getAsLong();
+            long sls = successorTask.earliestLatestValues().latestStart.getAsLong();
+            long slf = successorTask.earliestLatestValues().latestFinish.getAsLong();
 
-            switch (succDependency.type()) {
+            switch (successorDependency.type()) {
             case FS:
-                lf = Math.min(lf, sls - succDependency.lag());
+                lf = Math.min(lf, sls - successorDependency.lag());
                 break;
             case SS:
-                lf = Math.min(lf, sls + duration.value() - succDependency.lag());
+                lf = Math.min(lf, sls + duration.value() - successorDependency.lag());
                 break;
             case FF:
-                lf = Math.min(lf, slf - succDependency.lag());
+                lf = Math.min(lf, slf - successorDependency.lag());
                 break;
             case SF:
-                lf = Math.min(lf, slf + duration.value() - succDependency.lag());
+                lf = Math.min(lf, slf + duration.value() - successorDependency.lag());
             }
             this.latestFinish = OptionalLong.of(lf);
         }

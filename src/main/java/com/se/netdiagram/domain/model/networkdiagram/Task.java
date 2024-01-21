@@ -93,7 +93,7 @@ public class Task {
             throw new IllegalArgumentException("A task cannot have the same predecessor twice!");
         }
 
-        if (this.additionOfDependencyCreatesACircularDepenendency(predDependency)) {
+        if (this.additionOfDependencyCreatesACircularDependency(predDependency)) {
             throw new IllegalArgumentException("Adding a predecessor should not create a circular dependency!");
         }
 
@@ -103,7 +103,7 @@ public class Task {
         earliestLatestValues = new EarliestLatestValues();
     }
 
-    private boolean additionOfDependencyCreatesACircularDepenendency(Dependency predDependency) {
+    private boolean additionOfDependencyCreatesACircularDependency(Dependency predDependency) {
         for (Dependency dependency : successors) {
             Task nextTask = dependency.task();
 
@@ -111,7 +111,7 @@ public class Task {
                 return true;
             }
 
-            if (nextTask.additionOfDependencyCreatesACircularDepenendency(predDependency)) {
+            if (nextTask.additionOfDependencyCreatesACircularDependency(predDependency)) {
                 return true;
             }
         }
