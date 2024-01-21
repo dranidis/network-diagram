@@ -1,0 +1,80 @@
+[
+    {
+        "id": "A",
+        "duration": 1,
+        "predIds": []
+    },
+    {
+        "id": "B",
+        "duration": 2,
+        "predIds": []
+    },
+    {
+        "id": "C",
+        "duration": 2,
+        "predIds": [
+            {
+                "id": "A"
+            },
+            {
+                "id": "B"
+            }
+        ]
+    },
+    {
+        "id": "D",
+        "duration": 3,
+        "predIds": [
+            {
+                "id": "B"
+            }
+        ]
+    },
+    {
+        "id": "E",
+        "duration": 1,
+        "predIds": [
+            {
+                "id": "C"
+            }
+        ]
+    },
+    {
+        "id": "F",
+        "duration": 2,
+        "predIds": [
+            {
+                "id": "C"
+            },
+            {
+                "id": "D"
+            }
+        ]
+    },
+    {
+        "id": "G",
+        "duration": 4,
+        "predIds": []
+    },
+    {
+        "id": "H",
+        "duration": 2,
+        "predIds": [
+            {
+                "id": "E"
+            },
+            {
+                "id": "F"
+            }
+        ]
+    },
+    {
+        "id": "I",
+        "duration": 1,
+        "predIds": [
+            {
+                "id": "F"
+            }
+        ]
+    }
+]

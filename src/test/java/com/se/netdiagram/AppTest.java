@@ -41,7 +41,8 @@ public class AppTest {
                     System.err.println("While processing file" + args[0] + " an error occurred.");
                     System.err.println(e.getMessage());
                     // e.printStackTrace();
-                    fail("An exception occurred while processing file: " + args[0] + ".");
+                    fail("Test failed: An exception occurred while processing file: " + args[0] + ": "
+                            + e.getMessage());
                 }
             }
 

@@ -13,10 +13,6 @@ public class DependencyData {
         this(id, "FS", 0);
     }
 
-    public DependencyData(String id, String type) {
-        this(id, type, 0);
-    }
-
     public DependencyData(String id, String type, int lag) {
         this.id = id;
         this.type = type;
@@ -28,7 +24,10 @@ public class DependencyData {
     }
 
     public String getType() {
-        return type;
+        if (type.isEmpty())
+            return "FS";
+        else
+            return type;
     }
 
     public int getLag() {
