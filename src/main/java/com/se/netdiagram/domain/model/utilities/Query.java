@@ -34,4 +34,13 @@ public class Query {
         return result;
     }
 
+    public static <T> boolean any(List<T> list, Predicate<T> predicate) {
+        for (T element : list) {
+            if (predicate.test(element)) {
+                return true;
+            }
+        }
+        return false;
+    }
+
 }

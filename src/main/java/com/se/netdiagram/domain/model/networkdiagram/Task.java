@@ -4,6 +4,8 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 
+import com.se.netdiagram.domain.model.utilities.Query;
+
 public class Task {
     private TaskId id;
     private Duration duration;
@@ -45,30 +47,19 @@ public class Task {
     }
 
     public boolean dependsOnAnyTaskFrom(List<Task> tasks) {
-        for (Task task : tasks) {
-            if (this.dependsOn(task)) {
-                return true;
-            }
-        }
-        return false;
-    }
-
-    private boolean dependsOn(Task task) {
-        for (Dependency dependency : predecessors) {
-            if (dependency.task() == task) {
-                return true;
-            }
-        }
-        return false;
+        return Query.any(
+                predecessors,
+                dependency -> Query.any(
+                        tasks,
+                        task -> dependency.task() == task));
     }
 
     public boolean haveAnyTaskDependingOnMeFrom(List<Task> tasks) {
-        for (Task task : tasks) {
-            if (task.dependsOn(this)) {
-                return true;
-            }
-        }
-        return false;
+        return Query.any(
+                tasks,
+                task -> Query.any(
+                        task.predecessors,
+                        dependency -> dependency.task() == this));
     }
 
     /**
