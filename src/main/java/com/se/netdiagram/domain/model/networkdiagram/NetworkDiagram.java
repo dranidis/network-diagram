@@ -1,7 +1,6 @@
 package com.se.netdiagram.domain.model.networkdiagram;
 
 import java.util.ArrayList;
-import java.util.Collection;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -9,14 +8,15 @@ import java.util.OptionalLong;
 
 import com.se.netdiagram.domain.model.exceptions.DuplicateTaskKeyException;
 import com.se.netdiagram.domain.model.exceptions.KeyNotFoundException;
+import com.se.netdiagram.domain.model.utilities.Query;
 import com.se.netdiagram.domain.model.utilities.Util;
 
 public class NetworkDiagram {
     private Map<TaskId, Task> tasks = new HashMap<>();
     private long projectEnd;
 
-    public Collection<Task> tasks() {
-        return this.tasks.values();
+    public List<Task> tasks() {
+        return new ArrayList<>(this.tasks.values());
     }
 
     public Task getTask(String string) {
@@ -76,12 +76,9 @@ public class NetworkDiagram {
     public List<Path> getCriticalPaths() {
         List<Path> criticalPaths = new ArrayList<>();
 
-        List<Task> tasksWithZeroSlack = new ArrayList<>();
-
-        for (Task task : tasks()) {
-            if (task.earliestLatestValues().slack().getAsLong() == 0)
-                tasksWithZeroSlack.add(task);
-        }
+        List<Task> tasksWithZeroSlack = Query.filter(
+                tasks(),
+                task -> task.earliestLatestValues().slack().getAsLong() == 0);
 
         while (!tasksWithZeroSlack.isEmpty()) {
             List<Task> tasksToRemoveFromWorking = new ArrayList<>();
@@ -129,7 +126,6 @@ public class NetworkDiagram {
             for (Task task : notProcessedTasks) {
                 if (!task.haveAnyTaskDependingOnMeFrom(notProcessedTasks)) {
                     task.calculateLatestValuesAndSlack(projectEnd);
-
                     processedTasks.add(task);
                 }
             }
@@ -140,9 +136,13 @@ public class NetworkDiagram {
     private void addTaskToPaths(Task task, List<Path> criticalPaths) {
         boolean added = false;
         for (Path criticalPath : new ArrayList<>(criticalPaths)) {
-            List<Task> predTasks = getTaskPredIsInPath(task, criticalPath);
-            if (!predTasks.isEmpty()) {
-                appendTaskToPaths(task, predTasks, criticalPath, criticalPaths);
+            List<Task> predTasksInCriticalPath = Query.filterAndMap(
+                    task.predecessors(),
+                    dep -> criticalPath.containsTask(dep.task()),
+                    dep -> dep.task());
+            ;
+            if (!predTasksInCriticalPath.isEmpty()) {
+                appendTaskToPaths(task, predTasksInCriticalPath, criticalPath, criticalPaths);
                 added = true;
             }
         }
@@ -170,15 +170,4 @@ public class NetworkDiagram {
             paths.add(path.removeLastTask().addTask(task));
         }
     }
-
-    private List<Task> getTaskPredIsInPath(Task task, Path path) {
-        List<Task> predTasks = new ArrayList<>();
-        for (Dependency predDependency : task.predecessors()) {
-            Task predTask = predDependency.task();
-            if (path.containsTask(predTask))
-                predTasks.add(predTask);
-        }
-        return predTasks;
-    }
-
 }
