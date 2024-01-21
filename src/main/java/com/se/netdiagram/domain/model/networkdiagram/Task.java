@@ -92,6 +92,7 @@ public class Task {
         predDependency.task().successors.add(new Dependency(this, predDependency.type(), predDependency.lag()));
 
         earliestLatestValues = new EarliestLatestValues();
+        predDependency.task().earliestLatestValues = new EarliestLatestValues();
     }
 
     private boolean additionOfDependencyCreatesACircularDependency(Dependency predDependency) {
