@@ -78,7 +78,7 @@ public class NetworkDiagram {
 
         List<Task> tasksWithZeroSlack = Query.filter(
                 tasks(),
-                task -> task.earliestLatestValues().slack().getAsLong() == 0);
+                task -> task.slack() == 0);
 
         while (!tasksWithZeroSlack.isEmpty()) {
             List<Task> tasksToRemoveFromWorking = new ArrayList<>();

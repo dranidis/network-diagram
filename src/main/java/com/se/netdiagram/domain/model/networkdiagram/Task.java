@@ -122,4 +122,24 @@ public class Task {
         return earliestLatestValues;
     }
 
+    public long earliestStart() {
+        return earliestLatestValues.earliestStart().getAsLong();
+    }
+
+    public long earliestFinish() {
+        return earliestLatestValues.earliestFinish().getAsLong();
+    }
+
+    public long latestStart() {
+        return earliestLatestValues.latestStart().getAsLong();
+    }
+
+    public long latestFinish() {
+        return earliestLatestValues.latestFinish().getAsLong();
+    }
+
+    public long slack() {
+        return earliestLatestValues.slack().getAsLong();
+    }
+
 }
