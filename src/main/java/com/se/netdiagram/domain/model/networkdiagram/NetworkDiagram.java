@@ -73,27 +73,6 @@ public class NetworkDiagram {
         backward(projectEnd);
     }
 
-    public List<Path> getCriticalPaths() {
-        List<Path> criticalPaths = new ArrayList<>();
-
-        List<Task> tasksWithZeroSlack = Query.filter(
-                tasks(),
-                task -> task.slack() == 0);
-
-        while (!tasksWithZeroSlack.isEmpty()) {
-            List<Task> tasksToRemoveFromWorking = new ArrayList<>();
-            for (Task task : tasksWithZeroSlack) {
-                if (!task.dependsOnAnyTaskFrom(tasksWithZeroSlack)) {
-                    addTaskToPaths(task, criticalPaths);
-                    tasksToRemoveFromWorking.add(task);
-                }
-            }
-            tasksWithZeroSlack.removeAll(tasksToRemoveFromWorking);
-        }
-
-        return criticalPaths;
-    }
-
     /**
      * Makes forward processing assigning values to ES, EF
      * 
@@ -133,7 +112,34 @@ public class NetworkDiagram {
         }
     }
 
-    private void addTaskToPaths(Task task, List<Path> criticalPaths) {
+    /**
+     * Returns the critical paths of the network diagram. A critical path is a path
+     * that has zero slack for all its tasks.
+     * 
+     * @return
+     */
+    public List<Path> getCriticalPaths() {
+        List<Path> criticalPaths = new ArrayList<>();
+
+        List<Task> tasksWithZeroSlack = Query.filter(
+                tasks(),
+                task -> task.slack() == 0);
+
+        while (!tasksWithZeroSlack.isEmpty()) {
+            List<Task> tasksToRemoveFromWorking = new ArrayList<>();
+            for (Task task : tasksWithZeroSlack) {
+                if (!task.dependsOnAnyTaskFrom(tasksWithZeroSlack)) {
+                    addTaskToCriticalPaths(task, criticalPaths);
+                    tasksToRemoveFromWorking.add(task);
+                }
+            }
+            tasksWithZeroSlack.removeAll(tasksToRemoveFromWorking);
+        }
+
+        return criticalPaths;
+    }
+
+    private void addTaskToCriticalPaths(Task task, List<Path> criticalPaths) {
         boolean added = false;
         for (Path criticalPath : new ArrayList<>(criticalPaths)) {
             List<Task> predTasksInCriticalPath = Query.filterAndMap(
@@ -163,11 +169,23 @@ public class NetworkDiagram {
      * @param paths
      */
     private void appendTaskToPaths(Task task, List<Task> predTasks, Path path, List<Path> paths) {
+        // System.out.println("task: " + task.toString());
+        // System.out.println("task deps: " + task.predecessors().toString());
+        // System.out.println("predTasks: " + predTasks.toString());
+        // System.out.println("path: " + path.toString());
+        // System.out.println("paths: " + paths.toString());
         if (predTasks.contains(path.lastTask())) {
             paths.remove(path);
             paths.add(path.addTask(task));
         } else {
-            paths.add(path.removeLastTask().addTask(task));
+            Path pathButLast = path.removeLastTask();
+            if (Query.map(
+                    task.predecessors(),
+                    p -> p.task())
+                    .contains(pathButLast.lastTask())) {
+                paths.add(pathButLast.addTask(task));
+            }
         }
+        // System.out.println("POST paths: " + paths.toString());
     }
 }

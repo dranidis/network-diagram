@@ -51,4 +51,8 @@ public class Path {
         return this.tasks.get(this.tasks.size() - 1);
     }
 
+    public String toString() {
+        return tasks.toString();
+    }
+
 }
