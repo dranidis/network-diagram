@@ -5,6 +5,8 @@ import static org.junit.Assert.assertTrue;
 
 import org.junit.Test;
 
+import com.se.netdiagram.domain.model.networkdiagram.date.Duration;
+
 public class TaskTest {
 
     @Test(expected = IllegalArgumentException.class)
@@ -14,23 +16,23 @@ public class TaskTest {
     }
 
     @Test
-    public void aNewTaskShouldHaveAnEmptyES() {
+    public void aNewTask_Should_HaveAnEmptyES() {
         Task task = new Task(new TaskId("A"), new Duration(1));
-        assertFalse(task.earliestLatestValues().earliestStart().isPresent());
+        assertFalse(task.earliestLatest().earliestStart().isDateIsPresent());
     }
 
     @Test
-    public void whenCalculateEarliestValuesESShouldBeNonEmpty() {
+    public void when_CalculateEarliest_ESShouldBeNonEmpty() {
         Task task = new Task(new TaskId("A"), new Duration(1));
-        task.calculateEarliestValues();
-        assertTrue(task.earliestLatestValues().earliestStart().isPresent());
+        task.calculateEarliest();
+        assertTrue(task.earliestLatest().earliestStart().isDateIsPresent());
     }
 
     @Test
-    public void whenAddingPredecessorsESShouldGetEmpty() {
+    public void when_AddingPredecessors_ESShouldGetEmpty() {
         Task task = new Task(new TaskId("A"), new Duration(1));
-        task.calculateEarliestValues();
+        task.calculateEarliest();
         task.addPredecessor(new Dependency(new Task(new TaskId("B"), new Duration(1)), DependencyType.FS));
-        assertFalse(task.earliestLatestValues().earliestStart().isPresent());
+        assertFalse(task.earliestLatest().earliestStart().isDateIsPresent());
     }
 }

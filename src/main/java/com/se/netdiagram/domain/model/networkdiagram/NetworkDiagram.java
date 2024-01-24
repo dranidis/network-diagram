@@ -4,12 +4,13 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.OptionalLong;
 
 import com.se.netdiagram.domain.model.exceptions.DuplicateTaskKeyException;
 import com.se.netdiagram.domain.model.exceptions.KeyNotFoundException;
+import com.se.netdiagram.domain.model.networkdiagram.date.Date;
+import com.se.netdiagram.domain.model.networkdiagram.date.Duration;
+import com.se.netdiagram.domain.model.networkdiagram.date.Lag;
 import com.se.netdiagram.domain.model.utilities.Query;
-import com.se.netdiagram.domain.model.utilities.Util;
 
 public class NetworkDiagram {
     private Map<TaskId, Task> tasks = new HashMap<>();
@@ -52,7 +53,7 @@ public class NetworkDiagram {
      * processing is triggered that updates the ES, EF, LS, LF and Slack values of
      * all tasks.
      */
-    public void addPredecessorToTask(String aTaskId, String aPredId, String dependencyType, int lag)
+    public void addPredecessorToTask(String aTaskId, String aPredId, String dependencyType, long lag)
             throws KeyNotFoundException {
         TaskId taskId = new TaskId(aTaskId);
         Task task = tasks.get(taskId);
@@ -63,7 +64,10 @@ public class NetworkDiagram {
             throw new KeyNotFoundException("Not existing predecessor KEY: " + aPredId + " in Task: " + task.id());
         }
 
-        task.addPredecessor(new Dependency(predTask, DependencyType.valueOf(dependencyType), lag));
+        task.addPredecessor(new Dependency(
+                predTask,
+                DependencyType.valueOf(dependencyType),
+                new Lag(lag)));
 
         forwardAndBackWard();
     }
@@ -79,7 +83,7 @@ public class NetworkDiagram {
      * @return project end
      */
     private long forward() {
-        OptionalLong projectEnd = OptionalLong.of(0);
+        Date projectEnd = new Date(0);
         List<Task> notProcessedTasks = new ArrayList<>(tasks());
 
         while (!notProcessedTasks.isEmpty()) {
@@ -87,8 +91,10 @@ public class NetworkDiagram {
 
             for (Task task : notProcessedTasks) {
                 if (!task.dependsOnAnyTaskFrom(notProcessedTasks)) {
-                    task.calculateEarliestValues();
-                    projectEnd = Util.max(projectEnd, task.earliestLatestValues().earliestFinish());
+                    task.calculateEarliest();
+                    projectEnd = new Date(
+                            Math.max(projectEnd.getAsLong(),
+                                    task.earliestLatest().earliestFinish().getAsLong()));
                     processedTasks.add(task);
                 }
             }
@@ -104,7 +110,7 @@ public class NetworkDiagram {
             List<Task> processedTasks = new ArrayList<>();
             for (Task task : notProcessedTasks) {
                 if (!task.haveAnyTaskDependingOnMeFrom(notProcessedTasks)) {
-                    task.calculateLatestValuesAndSlack(projectEnd);
+                    task.calculateLatestAndSlack(projectEnd);
                     processedTasks.add(task);
                 }
             }

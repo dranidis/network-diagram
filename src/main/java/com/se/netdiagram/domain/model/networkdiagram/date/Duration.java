@@ -1,17 +1,21 @@
-package com.se.netdiagram.domain.model.networkdiagram;
+package com.se.netdiagram.domain.model.networkdiagram.date;
 
 public class Duration {
 
-    private int value;
+    private long value;
 
-    public Duration(int value) {
+    public Duration(long value) {
         if (value < 0)
             throw new IllegalArgumentException("Duration must be positive");
         this.value = value;
     }
 
-    public int value() {
+    public long value() {
         return value;
+    }
+
+    public static Duration difference(long asLong, long asLong2) {
+        return new Duration(asLong - asLong2);
     }
 
     // public static Duration ofDays(int days) {

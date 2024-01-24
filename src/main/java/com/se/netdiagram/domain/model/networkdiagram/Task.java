@@ -4,6 +4,7 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 
+import com.se.netdiagram.domain.model.networkdiagram.date.Duration;
 import com.se.netdiagram.domain.model.utilities.Query;
 
 public class Task {
@@ -11,7 +12,7 @@ public class Task {
     private Duration duration;
     private List<Dependency> predecessors = new ArrayList<>();
     private List<Dependency> successors = new ArrayList<>();
-    private EarliestLatestValues earliestLatestValues = new EarliestLatestValues();
+    private EarliestLatest earliestLatest = new EarliestLatest();
 
     protected Task(TaskId taskId, Duration duration) {
         this.id = taskId;
@@ -34,7 +35,7 @@ public class Task {
         return duration;
     }
 
-    public int durationAsInt() {
+    public long durationAsInt() {
         return duration.value();
     }
 
@@ -91,8 +92,8 @@ public class Task {
         predecessors.add(predDependency);
         predDependency.task().successors.add(new Dependency(this, predDependency.type(), predDependency.lag()));
 
-        earliestLatestValues = new EarliestLatestValues();
-        predDependency.task().earliestLatestValues = new EarliestLatestValues();
+        earliestLatest = new EarliestLatest();
+        predDependency.task().earliestLatest = new EarliestLatest();
     }
 
     private boolean additionOfDependencyCreatesACircularDependency(Dependency predDependency) {
@@ -110,36 +111,36 @@ public class Task {
         return false;
     }
 
-    protected void calculateEarliestValues() {
-        earliestLatestValues = earliestLatestValues.calcEarliestValues(predecessors, duration);
+    protected void calculateEarliest() {
+        earliestLatest = earliestLatest.calculateEarliest(predecessors, duration);
     }
 
-    protected void calculateLatestValuesAndSlack(long projectEnd) {
-        earliestLatestValues = earliestLatestValues.calcLatestValuesAndSlack(successors, duration, projectEnd);
+    protected void calculateLatestAndSlack(long projectEnd) {
+        earliestLatest = earliestLatest.calculateLatestAndSlack(successors, duration, projectEnd);
     }
 
-    public EarliestLatestValues earliestLatestValues() {
-        return earliestLatestValues;
+    public EarliestLatest earliestLatest() {
+        return earliestLatest;
     }
 
     public long earliestStart() {
-        return earliestLatestValues.earliestStart().getAsLong();
+        return earliestLatest.earliestStart().getAsLong();
     }
 
     public long earliestFinish() {
-        return earliestLatestValues.earliestFinish().getAsLong();
+        return earliestLatest.earliestFinish().getAsLong();
     }
 
     public long latestStart() {
-        return earliestLatestValues.latestStart().getAsLong();
+        return earliestLatest.latestStart().getAsLong();
     }
 
     public long latestFinish() {
-        return earliestLatestValues.latestFinish().getAsLong();
+        return earliestLatest.latestFinish().getAsLong();
     }
 
     public long slack() {
-        return earliestLatestValues.slack().getAsLong();
+        return earliestLatest.slack().value();
     }
 
 }
